@@ -11,6 +11,20 @@ const held = new Set(), pressed = new Set();
 const valid = new Set(["KeyA", "KeyD", "ArrowLeft", "ArrowRight", "Space", "KeyW", "ArrowUp", "KeyJ", "KeyK", "KeyE", "ShiftLeft", "ShiftRight", "Escape"]);
 const atlas = new Image();
 atlas.src = "lorenzzo.png";
+const motionAtlas = new Image();
+motionAtlas.src = "lorenzzo-movimento.png";
+const combatAtlas = new Image();
+combatAtlas.src = "lorenzzo-combate.png";
+const pose = Object.freeze({
+  idle:0, walk:1, coil:5, rise:6, apex:7, fall:8, land:9,
+  dashStart:10, dashDrive:11, dashExtend:12, dashRecover:13, stagger:14,
+});
+const DASH_DURATION = .185;
+const LANDING_DURATION = .16;
+const whipHands = [[-20,-28],[-23,-41],[29,-38],[33,-39],[10,-27]];
+const originalWhipHands = [[-22,-43],[15,-34],[23,-49],[29,-33],[17,-31]];
+const gunHands = [[25,-49],[25,-52],[24,-50]];
+const originalGunHands = [[24,-46],[27,-46],[25,-47]];
 
 const platforms = [
   {x:0, w:976, y:444, ground:true}, {x:1230, w:1610, y:444, ground:true},
@@ -49,7 +63,7 @@ function spawn() {
   const shrine = shrines[checkpoint];
   player = {x:shrine.x, y:shrine.y, vx:0, vy:0, face:1, ground:true, coyote:0, buffer:0,
     hp:FULL_HP, ammo:FULL_AMMO, inv:0, hurt:0, action:null, actionTime:0,
-    dashTime:0, dashUsed:false, walk:0};
+    dashTime:0, dashUsed:false, walk:0, moveTime:0, landing:0, dashRecovery:0};
   enemies = enemySpecs.map(e => ({...e, y:444, maxHp:e.hp, face:-1, wind:0, cooldown:.35, flash:0}));
   bullets = []; particles = []; drops = []; shake = 0;
   camera = clamp(player.x - W * .42, 0, WORLD - W);
@@ -156,6 +170,7 @@ function damage(direction, fromFall=false) {
     const shrine = shrines[checkpoint];
     player.x = shrine.x; player.y = shrine.y; player.vx = 0; player.vy = 0;
     player.ground = true; player.hurt = 0; player.dashUsed = false;
+    player.landing = 0; player.dashRecovery = 0;
     camera = clamp(player.x - W*.42, 0, WORLD-W);
   }
   sfx(78,.24,.4,"sawtooth");
@@ -240,6 +255,8 @@ function update(dt) {
   if (elapsed >= toastUntil && !el("toast").hidden) el("toast").hidden = true;
   p.inv = Math.max(0,p.inv-dt);
   p.hurt = Math.max(0,p.hurt-dt);
+  p.landing = Math.max(0,p.landing-dt);
+  p.dashRecovery = Math.max(0,p.dashRecovery-dt);
   shake = Math.max(0,shake-dt);
   if (p.ground) p.coyote = .095;
   else p.coyote -= dt;
@@ -250,11 +267,13 @@ function update(dt) {
     if (direction && !p.action) p.face = direction;
     if (p.buffer > 0 && p.coyote > 0) {
       p.vy = -540; p.ground = false; p.coyote = 0; p.buffer = 0;
+      p.landing = 0; p.dashRecovery = 0;
       burst(p.x,p.y,"#7e656e",5);
       sfx(194,.12,1.4);
     }
     if ((pressed.has("ShiftLeft") || pressed.has("ShiftRight")) && dashUnlocked && !p.dashUsed && !p.ground) {
-      p.dashUsed = true; p.dashTime = .185; p.action = null;
+      p.dashUsed = true; p.dashTime = DASH_DURATION; p.action = null;
+      p.landing = 0;
       p.face = direction || p.face; p.vy = 0;
       sfx(410,.2,.53);
     } else if (!p.action && !p.dashTime) {
@@ -265,6 +284,7 @@ function update(dt) {
   updateAttack(dt);
   if (p.dashTime > 0) {
     p.dashTime = Math.max(0,p.dashTime-dt);
+    if (!p.dashTime) p.dashRecovery = .095;
     p.vx = 865*p.face; p.vy = 0;
     if (Math.random() < .7) burst(p.x-p.face*13,p.y-25,"#78b5a9",2);
   } else {
@@ -281,11 +301,19 @@ function update(dt) {
     const surfaces = dashUnlocked ? [...platforms,bridge] : platforms;
     const land = surfaces.filter(s => p.x+8 > s.x && p.x-8 < s.x+s.w && lastY <= s.y && p.y >= s.y)
       .sort((a,b) => a.y-b.y)[0];
-    if (land) { p.y = land.y; p.vy = 0; p.ground = true; p.dashUsed = false; }
+    if (land) {
+      if (p.vy > 130 && !p.hurt) {
+        p.landing = LANDING_DURATION;
+        p.dashRecovery = 0;
+        burst(p.x,land.y,"#82707d",5);
+      }
+      p.y = land.y; p.vy = 0; p.ground = true; p.dashUsed = false;
+    }
   }
   if (p.y > H+96) damage(0,true);
   if (mode !== "playing") return;
   p.walk += Math.abs(p.vx)*dt;
+  p.moveTime = p.ground && Math.abs(p.vx)>14 ? p.moveTime+dt : 0;
   for (const e of enemies) {
     if (!e.hp) continue;
     const distance = p.x-e.x;
@@ -571,11 +599,35 @@ function drawEnemy(e,t) {
   }
   ctx.restore();
 }
+function movementPose(p) {
+  if (p.hurt) return pose.stagger;
+  if (p.dashTime) {
+    const phase = (DASH_DURATION-p.dashTime)/DASH_DURATION;
+    return phase < .18 ? pose.dashStart : phase < .70 ? pose.dashDrive : pose.dashExtend;
+  }
+  if (p.dashRecovery && !p.ground) return pose.dashRecover;
+  if (!p.ground) {
+    if (p.vy < -480) return pose.coil;
+    if (p.vy < -95) return pose.rise;
+    return p.vy < 95 ? pose.apex : pose.fall;
+  }
+  if (p.landing > .045) return pose.land;
+  const speed = Math.abs(p.vx);
+  if (speed < 14) return pose.idle;
+  if (speed < 180 || p.moveTime < .17) return pose.walk + Math.floor(p.moveTime/.044)%4;
+  return null;
+}
+function drawNewFrame(image, frame, offset=0) {
+  const width=104, height=86;
+  ctx.drawImage(image,(frame%5)*width,Math.floor(frame/5)*height,width,height,-60+offset,-77,width,height);
+}
+function drawOriginalFrame(frame) {
+  ctx.drawImage(atlas,(frame%6)*128,Math.floor(frame/6)*128,128,128,-42,-73,77,77);
+}
 function drawPlayer(t) {
   const p=player;
-  if(p.inv>0 && !p.hurt && Math.floor(t*19)%2) ctx.globalAlpha=.47;
-  const foot=p.ground ? 0 : Math.sin(t*19)*1.5;
-  let f=Math.floor(t*4)%7, action=p.actionTime;
+  const action=p.actionTime;
+  let f=Math.floor(t*4)%7;
   if(p.hurt) f=13+Math.min(3,Math.floor((.31-p.hurt)*12));
   else if(p.action==="whip") f=18+Math.min(4,Math.floor(action/.072));
   else if(p.action==="shoot") f=23+Math.min(2,Math.floor(action/.11));
@@ -584,43 +636,70 @@ function drawPlayer(t) {
   else if(Math.abs(p.vx)>16) f=7+Math.floor(p.walk/16)%6;
 
   ctx.save();
-  ctx.translate(Math.round(p.x),Math.round(p.y+foot));
+  ctx.translate(Math.round(p.x),Math.round(p.y));
   ctx.scale(p.face,1);
   if (p.ground) {
     ctx.fillStyle="#100a14a0"; ctx.fillRect(-19,-2,41,3);
   }
-  if(atlas.complete && atlas.naturalWidth) {
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(atlas,(f%6)*128,Math.floor(f/6)*128,128,128,-42,-73,77,77);
-  } else polygon(ctx,[[-13,0],[-12,-56],[0,-70],[15,-58],[9,0]],"#b68c87");
-  if(p.action==="whip") {
-    const hand=[[ -22,-43],[15,-34],[23,-49],[29,-33],[17,-31]][f-18];
-    const shapes=[
-      [[-40,-48],[-54,-15],[-68,-22]],
-      [[33,-64],[68,-71],[91,-45]],
-      [[39,-76],[93,-85],[120,-45]],
-      [[59,-18],[111,-68],[121,-32]],
-      [[43,-24],[74,-3],[101,-23]]
-    ];
-    const shape=shapes[f-18];
-    if(shape) {
-      ctx.beginPath(); ctx.moveTo(...hand); ctx.bezierCurveTo(...shape.flat());
-      ctx.strokeStyle="#362731"; ctx.lineWidth=4; ctx.stroke();
-      ctx.strokeStyle=action>.12&&action<.28 ? "#e1b993" : "#a98177"; ctx.lineWidth=1.5; ctx.stroke();
+  const flashing = p.inv>0 && !p.hurt && Math.floor(t*19)%2;
+  const motion = p.action ? null : movementPose(p);
+  const combatReady = combatAtlas.complete && combatAtlas.naturalWidth > 0;
+  const motionReady = motionAtlas.complete && motionAtlas.naturalWidth > 0;
+  const useCombatPose = combatReady && (p.action || motion === pose.idle || motion === null);
+  ctx.imageSmoothingEnabled=false;
+  ctx.globalAlpha=flashing ? .47 : 1;
+  if (useCombatPose) {
+    const runCycle = [0,1,2,4,1,3];
+    const idleFrame = 10 + (Math.floor(t*2)%2);
+    const frame = p.action === "whip" ? f-13 : p.action === "shoot" ? f-11 :
+      motion === pose.idle ? idleFrame : runCycle[Math.floor(p.walk/15)%runCycle.length];
+    drawNewFrame(combatAtlas,frame);
+  } else if (motion !== null && motionReady) {
+    if (p.dashTime && p.dashTime < DASH_DURATION-.034) {
+      ctx.globalAlpha=.16;
+      drawNewFrame(motionAtlas,motion,-34);
+      ctx.globalAlpha=.31;
+      drawNewFrame(motionAtlas,motion,-17);
     }
+    ctx.globalAlpha=flashing ? .47 : 1;
+    drawNewFrame(motionAtlas,motion);
+  } else if (atlas.complete && atlas.naturalWidth) {
+    ctx.globalAlpha=flashing ? .47 : 1;
+    drawOriginalFrame(f);
+  } else {
+    polygon(ctx,[[-13,0],[-12,-56],[0,-70],[15,-58],[9,0]],"#b68c87");
+  }
+  if(p.action==="whip") {
+    const hand=(useCombatPose ? whipHands : originalWhipHands)[f-18];
+    const whipArc = [
+      [-43,-52,-62,-30,-63,-12], [5,-86,-3,-83,-31,-64],
+      [54,-67,92,-62,116,-35], [65,-35,107,-45,121,-30],
+      [55,-22,72,4,88,-12], [24,-28,37,-10,48,-13]
+    ];
+    const progress = action < .13 ? action/.13*2 : Math.min(4.999,2+(action-.13)/.23*3);
+    const segment = Math.floor(progress);
+    const blend = progress-segment;
+    const curve = whipArc[segment].map((point,i)=>point+(whipArc[segment+1][i]-point)*blend);
+    ctx.beginPath(); ctx.moveTo(...hand); ctx.bezierCurveTo(...curve);
+    ctx.strokeStyle="#362731"; ctx.lineWidth=4; ctx.stroke();
+    ctx.strokeStyle=action>=.13&&action<.25 ? "#e1b993" : "#a98177"; ctx.lineWidth=1.5; ctx.stroke();
   }
   if(p.action==="shoot") {
-    const handX=f===23 ? 24 : f===24 ? 27 : 25, handY=f===25 ? -47 : -46;
-    ctx.fillStyle="#2c232d"; ctx.fillRect(handX-2,handY-3,34,7);
-    ctx.fillRect(handX+3,handY-12,7,24);
-    ctx.fillStyle="#c7aaa1"; ctx.fillRect(handX,handY-1,31,3);
-    ctx.fillRect(handX+5,handY-10,3,20);
-    ctx.fillStyle="#f5d7a8"; ctx.fillRect(handX+5,handY-2,4,4);
-    ctx.fillStyle="#92717b"; ctx.fillRect(handX+29,handY-2,3,5);
-    if(action>.12&&action<.176) {
-      glow(ctx,handX+35,handY,37,"253,156,71",.48);
-      polygon(ctx,[[handX+31,handY],[handX+40,handY-7],[handX+43,handY-3],[handX+58,handY],[handX+42,handY+3],[handX+40,handY+6]],"#f8b470");
-      ctx.fillStyle="#ffe7ad"; ctx.fillRect(handX+31,handY-1,15,2);
+    const [handX,handY]=(useCombatPose ? gunHands : originalGunHands)[f-23];
+    const muzzleX=58, muzzleY=-46;
+    // The longest arm is the foot of the cross, turned forward to serve as the muzzle.
+    const barX=handX+5;
+    line(ctx,[[handX-2,handY],[barX,handY],[muzzleX,muzzleY]],"#251e2b",7);
+    line(ctx,[[barX,handY-10],[barX,handY+10]],"#251e2b",7);
+    line(ctx,[[handX,handY],[barX,handY],[muzzleX,muzzleY]],"#c7aaa1",3);
+    line(ctx,[[barX,handY-10],[barX,handY+10]],"#c7aaa1",3);
+    ctx.fillStyle="#f5d7a8"; ctx.fillRect(barX-2,handY-2,4,4);
+    ctx.fillStyle="#92717b"; ctx.fillRect(muzzleX-3,muzzleY-2,3,5);
+    if(action>=.12&&action<.176) {
+      glow(ctx,muzzleX+4,muzzleY,37,"253,156,71",.48);
+      polygon(ctx,[[muzzleX,muzzleY],[muzzleX+9,muzzleY-7],[muzzleX+12,muzzleY-3],
+        [muzzleX+27,muzzleY],[muzzleX+11,muzzleY+3],[muzzleX+9,muzzleY+6]],"#f8b470");
+      ctx.fillStyle="#ffe7ad"; ctx.fillRect(muzzleX,muzzleY-1,15,2);
     }
   }
   ctx.restore();
