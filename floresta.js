@@ -313,7 +313,7 @@ function drawForestMentor(x,y) {
 function drawChild(t) {
   const p=player;
   let frame=0;
-  if (p.action === "whip") frame=p.actionTime < .13 ? 8 : 9;
+  if (p.action === "whip") frame=p.actionTime < .112 ? 8 : 9;
   else if (p.action === "shoot") frame=p.actionTime >= .12 && p.actionTime < .21 ? 11 : 10;
   else if (!p.ground) frame=p.vy < -160 ? 4 : p.vy < 92 ? 5 : 6;
   else if (p.landing > .06) frame=7;
@@ -328,18 +328,6 @@ function drawChild(t) {
     ctx.imageSmoothingEnabled=false;
     ctx.drawImage(childAtlas,(frame%4)*88,Math.floor(frame/4)*74,88,74,-50,-65,88,74);
   } else polygon(ctx,[[-12,0],[-8,-48],[0,-58],[11,-46],[10,0]],"#748a91");
-  if (p.action === "whip") {
-    const a=p.actionTime;
-    ctx.beginPath();
-    if (frame===8) {
-      ctx.moveTo(-16,-28); ctx.bezierCurveTo(-38,-36,-66,-40,-64+120*a,-10);
-    } else {
-      const k=Math.min(1,(a-.13)/.23);
-      ctx.moveTo(19,-36); ctx.bezierCurveTo(50,-47,112-k*66,-54+k*62,118-k*72,-33+k*19);
-    }
-    ctx.lineWidth=3; ctx.strokeStyle="#34272c"; ctx.stroke();
-    ctx.lineWidth=1.5; ctx.strokeStyle="#d6ae7d"; ctx.stroke();
-  }
   if (p.action === "shoot") {
     const grip=frame===11 ? -42 : -41;
     line(ctx,[[17,grip],[26,grip],[58,-42]],"#29272e",6);

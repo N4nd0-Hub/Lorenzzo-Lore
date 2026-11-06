@@ -21,8 +21,6 @@ const pose = Object.freeze({
 });
 const DASH_DURATION = .185;
 const LANDING_DURATION = .16;
-const whipHands = [[-20,-28],[-23,-41],[29,-38],[33,-39],[10,-27]];
-const originalWhipHands = [[-22,-43],[15,-34],[23,-49],[29,-33],[17,-31]];
 const gunHands = [[25,-49],[25,-52],[24,-50]];
 const originalGunHands = [[24,-46],[27,-46],[25,-47]];
 
@@ -196,13 +194,14 @@ function attack(type) {
   player.action = type;
   player.actionTime = 0;
   player.actionHit = false;
+  if (type === "whip") resetWhip(player);
 }
 function updateAttack(dt) {
   if (!player.action) return;
   player.actionTime += dt;
   const whip = player.action === "whip";
   const time = player.actionTime;
-  if (!player.actionHit && time >= (whip ? .13 : .12)) {
+  if (!player.actionHit && time >= (whip ? WHIP_STRIKE : .12)) {
     player.actionHit = true;
     if (whip) {
       sfx(240,.13,.36,"sawtooth");
@@ -220,7 +219,7 @@ function updateAttack(dt) {
       shake = .11;
     }
   }
-  if (time >= (whip ? .36 : .33)) player.action = null;
+  if (time >= (whip ? WHIP_DURATION : .33)) player.action = null;
 }
 function interact() {
   let hint = "";
@@ -326,6 +325,7 @@ function update(dt) {
     else damage(0,true);
   }
   if (mode !== "playing") return;
+  if (p.action === "whip") updateWhip(p,dt);
   p.walk += Math.abs(p.vx)*dt;
   p.moveTime = p.ground && Math.abs(p.vx)>14 ? p.moveTime+dt : 0;
   for (const e of enemies) {
@@ -650,7 +650,7 @@ function drawPlayer(t) {
   const action=p.actionTime;
   let f=Math.floor(t*4)%7;
   if(p.hurt) f=13+Math.min(3,Math.floor((.31-p.hurt)*12));
-  else if(p.action==="whip") f=18+Math.min(4,Math.floor(action/.072));
+  else if(p.action==="whip") f=18+whipPose(action);
   else if(p.action==="shoot") f=23+Math.min(2,Math.floor(action/.11));
   else if(p.dashTime) f=10;
   else if(!p.ground) f=p.vy < 70 ? 9 : 11;
@@ -689,21 +689,6 @@ function drawPlayer(t) {
     drawOriginalFrame(f);
   } else {
     polygon(ctx,[[-13,0],[-12,-56],[0,-70],[15,-58],[9,0]],"#b68c87");
-  }
-  if(p.action==="whip") {
-    const hand=(useCombatPose ? whipHands : originalWhipHands)[f-18];
-    const whipArc = [
-      [-43,-52,-62,-30,-63,-12], [5,-86,-3,-83,-31,-64],
-      [54,-67,92,-62,116,-35], [65,-35,107,-45,121,-30],
-      [55,-22,72,4,88,-12], [24,-28,37,-10,48,-13]
-    ];
-    const progress = action < .13 ? action/.13*2 : Math.min(4.999,2+(action-.13)/.23*3);
-    const segment = Math.floor(progress);
-    const blend = progress-segment;
-    const curve = whipArc[segment].map((point,i)=>point+(whipArc[segment+1][i]-point)*blend);
-    ctx.beginPath(); ctx.moveTo(...hand); ctx.bezierCurveTo(...curve);
-    ctx.strokeStyle="#362731"; ctx.lineWidth=4; ctx.stroke();
-    ctx.strokeStyle=action>=.13&&action<.25 ? "#e1b993" : "#a98177"; ctx.lineWidth=1.5; ctx.stroke();
   }
   if(p.action==="shoot") {
     const [handX,handY]=(useCombatPose ? gunHands : originalGunHands)[f-23];
@@ -751,6 +736,7 @@ function draw(t) {
   }
   if (forest) drawChild(t);
   else drawPlayer(t);
+  drawWhip(player);
   for(const p of particles) {
     ctx.globalAlpha=Math.min(1,p.t*4);
     ctx.fillStyle=p.color; ctx.fillRect(Math.round(p.x),Math.round(p.y),2,2);
