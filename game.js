@@ -60,19 +60,26 @@ function objective(next) {
   el("objective-text").textContent = tutorial[stage][1];
 }
 function spawn() {
-  const shrine = shrines[checkpoint];
+  const shrine = forest ? {x:162,y:forestGround} : shrines[checkpoint];
   player = {x:shrine.x, y:shrine.y, vx:0, vy:0, face:1, ground:true, coyote:0, buffer:0,
     hp:FULL_HP, ammo:FULL_AMMO, inv:0, hurt:0, action:null, actionTime:0,
     dashTime:0, dashUsed:false, walk:0, moveTime:0, landing:0, dashRecovery:0};
-  enemies = enemySpecs.map(e => ({...e, y:444, maxHp:e.hp, face:-1, wind:0, cooldown:.35, flash:0}));
+  enemies = (forest ? [] : enemySpecs).map(e => ({...e, y:444, maxHp:e.hp, face:-1, wind:0, cooldown:.35, flash:0}));
   bullets = []; particles = []; drops = []; shake = 0;
   camera = clamp(player.x - W * .42, 0, WORLD - W);
-  el("checkpoint").textContent = shrine.name;
+  if (forest) forestObjective();
+  else el("checkpoint").textContent = shrine.name;
   toastUntil = 0;
   el("toast").hidden = true;
   updateUI();
 }
 function newRun() {
+  if (forest) {
+    forest = null;
+    setChapter(false);
+    clearTalk();
+    stage = null;
+  }
   checkpoint = 0;
   dashUnlocked = false;
   objective("start");
@@ -86,14 +93,15 @@ function setMode(next) {
   el("pause").textContent = mode === "paused" ? "Continuar" : "Pausar";
   el("overlay").hidden = mode === "playing";
   el("reset").hidden = mode !== "paused";
+  el("chapter-skip").hidden = mode !== "title";
   if (mode === "playing") {
     canvas.focus({preventScroll:true});
     return;
   }
   el("prompt").hidden = true;
   const views = {
-    paused:["PAUSA", "Partida pausada", "Sua exploração continua do ponto em que parou.", "Continuar"],
-    dead:["SANTUÁRIO", "Lorenzzo caiu.", "Volte ao último santuário com vida e munição restauradas.", "Tentar de novo"],
+    paused:["PAUSA", "Partida pausada", forest ? "Retome o treinamento quando quiser." : "Sua exploração continua do ponto em que parou.", "Continuar"],
+    dead:["SANTUÁRIO", "Lourenzzo caiu.", "Volte ao último santuário com vida e munição restauradas.", "Tentar de novo"],
     won:["CAPELA EXPLORADA", "O sino voltou a tocar.", "Você encontrou a relíquia e alcançou o campanário. Fim do protótipo.", "Jogar de novo"]
   };
   if (views[mode]) {
@@ -124,6 +132,7 @@ function uiMarks(id, count, max, label) {
 function updateUI() {
   uiMarks("health", player.hp, FULL_HP, "de vida");
   uiMarks("ammo", player.ammo, FULL_AMMO, "cartuchos");
+  if (forest) return;
   const zone = player.x < 976 ? 0 : player.x < 1920 ? 1 : 2;
   el("location").textContent = regions[zone];
   el("map-marker").parentElement.style.setProperty("--progress", (player.x / WORLD * 100) + "%");
@@ -178,8 +187,9 @@ function damage(direction, fromFall=false) {
   if (!player.hp) setMode("dead");
 }
 function attack(type) {
+  if (forest && !forestCanAttack(type)) return;
   if (type === "shoot" && !player.ammo) {
-    say("Sem munição. Use o chicote ou descanse no santuário.");
+    say(forest ? "Use E junto à caixa para repor os cartuchos." : "Sem munição. Use o chicote ou descanse no santuário.");
     sfx(118,.09);
     return;
   }
@@ -196,13 +206,14 @@ function updateAttack(dt) {
     player.actionHit = true;
     if (whip) {
       sfx(240,.13,.36,"sawtooth");
+      if (forest) forestWhip();
       for (const e of enemies) {
         const distance = (e.x-player.x)*player.face;
         if (e.hp && distance >= -7 && distance <= 117 && range(e.y,player.y,46)) enemyHit(e,1);
       }
     } else {
       player.ammo--;
-      const x = player.x + 58 * player.face, y = player.y - 46;
+      const x = player.x + 58 * player.face, y = player.y - (forest ? 42 : 46);
       bullets.push({x,y,from:player.x + 8*player.face,vx:player.face*790,t:.58});
       burst(x,y,"#ffcf81",6);
       sfx(105,.16,.42,"square");
@@ -294,11 +305,11 @@ function update(dt) {
     p.vy = Math.min(710,p.vy+1280*dt);
   }
   const lastY = p.y;
-  p.x = clamp(p.x+p.vx*dt,15,WORLD-19);
+  p.x = clamp(p.x+p.vx*dt,15,(forest ? forestWidth : WORLD)-19);
   p.y += p.vy*dt;
   p.ground = false;
   if (p.vy >= 0) {
-    const surfaces = dashUnlocked ? [...platforms,bridge] : platforms;
+    const surfaces = forest ? forestPlatforms : dashUnlocked ? [...platforms,bridge] : platforms;
     const land = surfaces.filter(s => p.x+8 > s.x && p.x-8 < s.x+s.w && lastY <= s.y && p.y >= s.y)
       .sort((a,b) => a.y-b.y)[0];
     if (land) {
@@ -310,7 +321,10 @@ function update(dt) {
       p.y = land.y; p.vy = 0; p.ground = true; p.dashUsed = false;
     }
   }
-  if (p.y > H+96) damage(0,true);
+  if (p.y > H+96) {
+    if (forest) forestFall();
+    else damage(0,true);
+  }
   if (mode !== "playing") return;
   p.walk += Math.abs(p.vx)*dt;
   p.moveTime = p.ground && Math.abs(p.vx)>14 ? p.moveTime+dt : 0;
@@ -346,6 +360,7 @@ function update(dt) {
     const previousX = bullet.from ?? bullet.x;
     bullet.from = null;
     bullet.x += bullet.vx*dt; bullet.t -= dt;
+    if (forest) forestBullet(bullet,previousX);
     const hit = enemies.filter(e => e.hp && Math.max(previousX,bullet.x) >= e.x-17 && Math.min(previousX,bullet.x) <= e.x+17 && bullet.y > e.y-63 && bullet.y < e.y-8)
       .sort((a,b) => Math.abs(a.x-previousX)-Math.abs(b.x-previousX))[0];
     if (hit) { enemyHit(hit,2); bullet.t = 0; }
@@ -361,6 +376,12 @@ function update(dt) {
     particle.x += particle.vx*dt; particle.y += particle.vy*dt; particle.vy += 240*dt; particle.t -= dt;
   }
   particles = particles.filter(particle => particle.t > 0);
+  if (forest) {
+    forestTick();
+    camera += (clamp(p.x-W*.42,0,forestWidth-W)-camera)*Math.min(1,dt*6);
+    updateUI();
+    return;
+  }
   if (!dashUnlocked && p.x > 1960) objective("crypt");
   if (checkpoint < 1 && p.x >= 1260 && p.x < 1360 && p.ground) {
     checkpoint = 1; el("checkpoint").textContent = shrines[1].name;
@@ -707,15 +728,18 @@ function drawPlayer(t) {
 }
 function draw(t) {
   const kick=shake ? Math.sin(t*133)*shake*13 : 0;
-  const offset=Math.round(clamp(camera+kick,0,WORLD-W));
+  const offset=Math.round(clamp(camera+kick,0,(forest ? forestWidth : WORLD)-W));
   ctx.save(); ctx.translate(-offset,0);
-  for(let i=0;i<backdrops.length;i++) {
-    if(i*W<offset+W && (i+1)*W>=offset) ctx.drawImage(backdrops[i],i*W,0);
+  if (forest) drawForest(t,offset);
+  else {
+    for(let i=0;i<backdrops.length;i++) {
+      if(i*W<offset+W && (i+1)*W>=offset) ctx.drawImage(backdrops[i],i*W,0);
+    }
+    for(const platform of platforms) stone(platform,offset);
+    if(dashUnlocked) stone(bridge,offset);
+    scenery(t);
+    enemies.forEach(e=>drawEnemy(e,t));
   }
-  for(const platform of platforms) stone(platform,offset);
-  if(dashUnlocked) stone(bridge,offset);
-  scenery(t);
-  enemies.forEach(e=>drawEnemy(e,t));
   for(const d of drops) {
     const y=d.y+Math.sin(t*5+d.x)*3;
     glow(ctx,d.x,y,17,"226,179,118",.28);
@@ -725,7 +749,8 @@ function draw(t) {
     ctx.fillStyle="#f0ac66"; ctx.fillRect(b.x-10,b.y,20,2);
     ctx.fillStyle="#ffe6ac"; ctx.fillRect(b.x-4,b.y,8,2);
   }
-  drawPlayer(t);
+  if (forest) drawChild(t);
+  else drawPlayer(t);
   for(const p of particles) {
     ctx.globalAlpha=Math.min(1,p.t*4);
     ctx.fillStyle=p.color; ctx.fillRect(Math.round(p.x),Math.round(p.y),2,2);
@@ -739,6 +764,16 @@ function press(key) {
   held.add(key);
 }
 window.addEventListener("keydown", e => {
+  if (forest?.talk) {
+    if (["KeyE","Enter","Space"].includes(e.code)) {
+      e.preventDefault();
+      if (!e.repeat) advanceTalk();
+    } else if (e.code === "Tab") {
+      e.preventDefault();
+      el("dialogue-next").focus({preventScroll:true});
+    }
+    return;
+  }
   if (!valid.has(e.code)) return;
   if (e.code === "Escape" && ["playing","paused"].includes(mode) && !e.repeat) {
     e.preventDefault(); setMode(mode === "playing" ? "paused" : "playing");
@@ -747,12 +782,12 @@ window.addEventListener("keydown", e => {
   }
 });
 window.addEventListener("keyup", e=>held.delete(e.code));
-window.addEventListener("blur",()=>{ if(mode==="playing") setMode("paused"); });
+window.addEventListener("blur",()=>{ if(mode==="playing" && !forest?.talk) setMode("paused"); });
 document.querySelectorAll("[data-key]").forEach(button=>{
   const key=button.dataset.key;
   button.addEventListener("pointerdown",e=>{
     e.preventDefault();
-    if(mode!=="playing") return;
+    if(mode!=="playing" || forest?.talk) return;
     button.setPointerCapture(e.pointerId); press(key);
   });
   for(const event of ["pointerup","pointercancel","lostpointercapture"]) button.addEventListener(event,()=>held.delete(key));
@@ -760,10 +795,13 @@ document.querySelectorAll("[data-key]").forEach(button=>{
 el("primary").addEventListener("click",()=>{
   if(mode==="dead"){ spawn(); setMode("playing"); }
   else if(mode==="paused") setMode("playing");
+  else if(mode==="title") selectForest(true);
   else newRun();
 });
 el("pause").addEventListener("click",()=>setMode(mode==="playing" ? "paused" : "playing"));
-el("reset").addEventListener("click",newRun);
+el("reset").addEventListener("click",()=>forest ? selectForest(true) : newRun());
+el("chapter-skip").addEventListener("click",newRun);
+el("dialogue-next").addEventListener("click",advanceTalk);
 el("sound").addEventListener("click",()=>{
   sound=!sound;
   if(sound){
@@ -773,7 +811,7 @@ el("sound").addEventListener("click",()=>{
   }
   el("sound").textContent=sound ? "Som ligado" : "Som desligado";
   el("sound").setAttribute("aria-pressed",String(sound));
-  if(mode==="playing") canvas.focus({preventScroll:true});
+  if(mode==="playing") (forest?.talk ? el("dialogue-next") : canvas).focus({preventScroll:true});
 });
 el("fullscreen").addEventListener("click", async ()=>{
   try{
@@ -782,17 +820,17 @@ el("fullscreen").addEventListener("click", async ()=>{
   }catch{
     if(mode==="playing") say("Tela cheia indisponível neste navegador.");
   }
-  if(mode==="playing") canvas.focus({preventScroll:true});
+  if(mode==="playing") (forest?.talk ? el("dialogue-next") : canvas).focus({preventScroll:true});
 });
 canvas.addEventListener("pointerdown",()=>canvas.focus({preventScroll:true}));
-objective("start"); spawn();
+selectForest(false);
 let then=0, debt=0;
 function frame(now) {
   const delta=then ? Math.min((now-then)/1000,.055) : 0;
   then=now;
-  if(mode==="playing") {
+  if(mode==="playing" && !forest?.talk) {
     debt+=delta;
-    while(debt>=1/120 && mode==="playing"){
+    while(debt>=1/120 && mode==="playing" && !forest?.talk){
       update(1/120);
       pressed.clear(); debt-=1/120;
     }

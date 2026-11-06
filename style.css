@@ -97,3 +97,29 @@ kbd { display: inline-block; min-width: 19px; text-align: center; padding: 2px 4
   .toast { top: auto; bottom: 42px; }
 }
 @media(pointer: coarse) { .touch { display: flex; } }
+#frame-content { display: contents; }
+#chapter-place { font-weight: inherit; }
+.forest { border-color: #62715c; }
+.forest .frame-footer { border-color: #62715c; }
+.forest .hud { background: #172623eb; border-color: #62715c; }
+.forest [data-key="ShiftLeft"] { display: none; }
+.field p.training-step { margin-top: 13px; color: #d6c38b; font: 10px ui-monospace,monospace; text-transform: uppercase; letter-spacing: .075em; }
+.dialogue { position: absolute; z-index: 2; inset: 0; display: flex; align-items: flex-end; padding: clamp(8px,2vw,22px); background: linear-gradient(#19252520 8%,#151a19c9 94%); }
+.dialogue-portraits { position: absolute; inset: 9% 4% 19%; display: flex; align-items: flex-end; justify-content: space-between; pointer-events: none; }
+.portrait { display: block; width: 44%; height: 100%; object-fit: contain; object-position: center bottom; image-rendering: pixelated; opacity: .45; filter: brightness(.61); }
+.portrait.lourenzzo { height: 84%; }
+.dialogue[data-speaker="mentor"] .mentor, .dialogue[data-speaker="lourenzzo"] .lourenzzo { opacity: 1; filter: drop-shadow(0 4px 14px #0a1012aa); }
+.dialogue-panel { position: relative; z-index: 1; width: 100%; display: grid; min-height: 152px; padding: clamp(10px,1.55vw,20px); gap: 8px; border: 1px solid #a48e65; background: linear-gradient(125deg,#1b2523,#222525); box-shadow: inset 0 0 0 4px #343b306b,0 10px 30px #101612aa; }
+.dialogue-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dialogue-meta h2 { margin: 0; color: #edd0a1; font: 700 11px ui-monospace,monospace; text-transform: uppercase; letter-spacing: .13em; }
+.dialogue-meta span { color: #c8c5a7; font: 10px ui-monospace,monospace; }
+#dialogue-line { margin: 0; min-height: 2.6em; color: #f3ecdc; font: clamp(17px,2.05vw,25px)/1.33 Georgia,"Times New Roman",serif; }
+#dialogue-next { justify-self: end; align-self: end; border: 1px solid #a48e65; background: #34382e; color: #f5e3bc; padding: 6px 10px; font: 650 11px system-ui,sans-serif; }
+#dialogue-next:hover { background: #484638; }
+@media(max-width:580px) {
+  .dialogue { padding: 5px; }
+  .dialogue-portraits { inset: 2% 5% 42%; }
+  .dialogue-panel { min-height: 0; padding: 8px; gap: 4px; }
+  #dialogue-line { font-size: 15px; line-height: 1.24; min-height: 3.35em; }
+  #dialogue-next { padding: 4px 7px; }
+}
