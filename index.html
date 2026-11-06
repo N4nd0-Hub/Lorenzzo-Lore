@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#120f14">
+  <meta name="description" content="Explore a Capela do Sino Mudo com Lorenzzo Montenegro em um protótipo de metroidvania.">
+  <title>Lorenzzo · A Capela do Sino Mudo</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="game.js"></script>
+</head>
+<body>
+<main class="shell">
+  <header class="masthead">
+    <div class="brand">
+      <span class="sigil" aria-hidden="true">✦</span>
+      <div><strong>LORENZZO</strong><span>MONTENEGRO</span></div>
+    </div>
+    <span class="edition">PROTÓTIPO JOGÁVEL <b>01</b></span>
+  </header>
+
+  <section class="heading">
+    <div><p class="eyebrow">ATO I <span></span> AS RUÍNAS</p><h1>A Capela do Sino Mudo</h1></div>
+    <div class="toolbar">
+      <button id="sound" type="button" aria-pressed="false" title="Ativar ou silenciar os efeitos sonoros">Som desligado</button>
+      <button id="fullscreen" type="button" title="Tela cheia">Tela cheia</button>
+      <button id="pause" type="button" title="Pausar a partida" disabled>Pausar</button>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section class="play" id="play" aria-label="Área do jogo">
+      <div class="frame">
+        <canvas id="game" width="960" height="540" aria-label="Metroidvania em pixel art" tabindex="0"></canvas>
+        <div class="hud" aria-label="Estado da partida">
+          <div class="hud-group"><span>VIDA</span><div id="health" aria-label="5 de 5 de vida"></div></div>
+          <div class="hud-group"><span>MUNIÇÃO</span><div id="ammo" aria-label="5 de 5 cartuchos"></div></div>
+        </div>
+        <div id="prompt" class="prompt" hidden></div>
+        <div id="toast" class="toast" role="status" hidden></div>
+        <div id="overlay" class="overlay">
+          <div class="overlay-card">
+            <span class="emblem" aria-hidden="true">✧</span>
+            <p id="overlay-kicker" class="eyebrow">LORENZZO MONTENEGRO</p>
+            <h2 id="overlay-title">O sino parou.</h2>
+            <p id="overlay-text">Atravesse a capela e descubra como chegar ao campanário.</p>
+            <button id="primary" type="button">Entrar na capela <span>↗</span></button>
+            <button id="reset" class="text-button" type="button" hidden>Recomeçar partida</button>
+          </div>
+        </div>
+      </div>
+      <div class="frame-footer"><span><i></i> <b id="location">Átrio</b></span><span id="checkpoint">Santuário do átrio</span></div>
+      <div class="touch" aria-label="Controles de toque">
+        <div><button data-key="ArrowLeft" aria-label="Esquerda">◀</button><button data-key="ArrowRight" aria-label="Direita">▶</button></div>
+        <div><button data-key="KeyE">Interagir</button><button data-key="KeyJ">Chicote</button><button data-key="KeyK">Tiro</button><button data-key="ShiftLeft">Dash</button><button data-key="Space">Pular</button></div>
+      </div>
+    </section>
+
+    <aside class="field">
+      <section class="field-panel objective">
+        <p class="eyebrow"><span class="index">01</span> OBJETIVO</p>
+        <h2 id="objective-title">Explore as ruínas</h2>
+        <p id="objective-text">Siga para a direita. O caminho do campanário fica acima do átrio.</p>
+        <div class="map" aria-label="Mapa de regiões">
+          <i id="map-marker" aria-hidden="true"></i>
+          <span class="map-node active" data-zone="0">Átrio</span><span class="map-node" data-zone="1">Nave</span><span class="map-node" data-zone="2">Cripta</span>
+        </div>
+      </section>
+      <section class="field-panel">
+        <p class="eyebrow"><span class="index">02</span> CONTROLES</p>
+        <dl class="controls">
+          <div><dt>Mover</dt><dd><kbd>A</kbd><kbd>D</kbd><small>ou</small><kbd>←</kbd><kbd>→</kbd></dd></div>
+          <div><dt>Pular</dt><dd><kbd>Espaço</kbd></dd></div>
+          <div><dt>Chicote</dt><dd><kbd>J</kbd></dd></div>
+          <div><dt>Pistola-cruz</dt><dd><kbd>K</kbd></dd></div>
+          <div><dt>Interagir</dt><dd><kbd>E</kbd></dd></div>
+          <div id="dash-guide" class="locked"><dt>Dash aéreo</dt><dd><kbd>Shift</kbd></dd></div>
+        </dl>
+      </section>
+      <p class="field-note">O chicote poupa munição. Santuários recuperam vida e cartuchos.</p>
+    </aside>
+  </div>
+  <footer class="credits"><span>◇</span> LORENZZO MONTENEGRO <span>·</span> PROTÓTIPO 0.1</footer>
+</main>
+</body>
+</html>
