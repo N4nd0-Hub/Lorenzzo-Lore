@@ -5,8 +5,6 @@ const WHIP_LINK_LENGTH = 8.25;
 const WHIP_SOLVER_PASSES = 24;
 const WHIP_DURATION = .36;
 const WHIP_STRIKE = .13;
-const whipHands = [[-20,-28],[-23,-41],[29,-38],[33,-39],[10,-27]];
-const originalWhipHands = [[-22,-43],[15,-34],[23,-49],[29,-33],[17,-31]];
 const childWhipHands = [[-16,-28],[19,-36]];
 const whipTipPath = [
   [0,-50,-14], [.05,-67,-60], [.085,-34,-94],
@@ -15,17 +13,9 @@ const whipTipPath = [
 ];
 let whipNodes = [];
 
-function whipPose(time) {
-  if (time < .052) return 0;
-  if (time < .112) return 1;
-  if (time < .158) return 2;
-  return time < .232 ? 3 : 4;
-}
-
 function whipAnchors(p) {
   const time = p.actionTime;
-  const hands = combatAtlas.complete && combatAtlas.naturalWidth ? whipHands : originalWhipHands;
-  const [hx,hy] = forest ? childWhipHands[time < .112 ? 0 : 1] : hands[whipPose(time)];
+  const [hx,hy] = childWhipHands[time < .112 ? 0 : 1];
   const hand = {x:p.x+hx*p.face, y:p.y+hy};
   const next = whipTipPath.findIndex(([t])=>t>=time);
   const segment = next < 0 ? whipTipPath.length-2 : Math.max(0,next-1);

@@ -339,3 +339,7 @@ button:focus-visible, a:focus-visible { outline: 2px solid #e8c47a; outline-offs
   .luz, .fita, .capa-dica { animation: none; }
   :root { --virar: 1ms; }
 }
+
+.nota-img { display: block; width: calc(100% + 36px); margin: -16px -18px 10px; height: 170px; object-fit: cover; object-position: 50% 18%; background: #1b1411; border-bottom: 1px solid #8a6a3a; }
+.credito { position: fixed; right: 12px; bottom: 8px; margin: 0; font: italic 12px "EB Garamond", serif; color: #8d775f; }
+@media (max-width: 760px) { .credito { display: none; } }

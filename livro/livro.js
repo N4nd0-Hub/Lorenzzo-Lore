@@ -32,7 +32,8 @@ const NOTAS = [
   { id: "prato", trecho: "pequeno prato de borda azul", titulo: "O prato de borda azul",
     texto: "Rachado. Era o prato em que Lorenzzo costumava comer. Seguiu viagem embrulhado num pano, junto com a folha dos nomes." },
   { id: "quinn", trecho: "Padre Quinn", titulo: "Padre Quinn",
-    texto: "Joaquín. O homem que o tirou dos escombros e fez a viagem com ele. Anos depois, seria o mestre que o treinou na Ordem." },
+    texto: "Joaquín. O homem que o tirou dos escombros e fez a viagem com ele. Anos depois, seria o mestre que o treinou na Ordem.",
+    imagem: "arte/padre-quinn-busto.png" },
 ];
 
 const VELOCIDADES = [["lenta", 30], ["normal", 14], ["rápida", 5], ["instantânea", 0]];
@@ -429,7 +430,7 @@ function abrir() {
   livro.classList.remove("fechado");
   $("capa").setAttribute("aria-label", "Capa do livro");
   $("capa").tabIndex = -1;
-  ["barra", "ant", "prox", "dica"].forEach(id => ($(id).hidden = false));
+  ["barra", "ant", "prox", "dica", "credito"].forEach(id => ($(id).hidden = false));
   $("dica").textContent = unica ? "Toque na página para terminar de escrever · deslize para virar" : "Clique na página para terminar de escrever · setas para virar";
   $("capa").blur();
   atual = 0; desenhar();
@@ -445,7 +446,7 @@ function fechar() {
   requestAnimationFrame(() => livro.classList.add("fechado"));
   $("capa").setAttribute("aria-label", "Abrir o livro");
   $("capa").tabIndex = 0;
-  ["barra", "ant", "prox", "dica"].forEach(id => ($(id).hidden = true));
+  ["barra", "ant", "prox", "dica", "credito"].forEach(id => ($(id).hidden = true));
 }
 
 /* ---------------- Notas ---------------- */
@@ -455,6 +456,8 @@ function abrirNota(span) {
   if (!nota) return;
   $("nota-titulo").textContent = nota.titulo;
   $("nota-texto").textContent = nota.texto;
+  $("nota-img").hidden = !nota.imagem;
+  if (nota.imagem) $("nota-img").src = nota.imagem;
   const caixa = $("nota");
   caixa.hidden = false;
   const r = span.getBoundingClientRect(), w = caixa.offsetWidth, h = caixa.offsetHeight;
