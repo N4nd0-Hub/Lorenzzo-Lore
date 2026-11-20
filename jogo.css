@@ -103,9 +103,9 @@ kbd { display: inline-block; min-width: 20px; text-align: center; padding: 2px 5
 .dialogue { position: absolute; z-index: 2; inset: 0; display: flex; align-items: flex-end; padding: clamp(8px, 2vw, 22px); background: linear-gradient(#0b0f0e10 10%, #0b0f0ed0 92%); }
 .dialogue-portraits { position: absolute; inset: 4% 3% 22%; display: flex; align-items: flex-end; justify-content: space-between; pointer-events: none; }
 .portrait { display: block; height: 100%; object-fit: contain; object-position: center bottom; opacity: .4; filter: brightness(.5) saturate(.6); transition: opacity .25s, filter .25s, transform .25s; }
-.portrait.lorenzzo { width: 34%; height: 86%; image-rendering: pixelated; transform: translateX(-4%); }
+.portrait.lourenzzo { width: 34%; height: 86%; image-rendering: pixelated; transform: translateX(-4%); }
 .portrait.mentor { width: 52%; height: 112%; transform: translate(6%, 6%); }
-.dialogue[data-speaker="mentor"] .mentor, .dialogue[data-speaker="lorenzzo"] .lorenzzo { opacity: 1; filter: drop-shadow(0 6px 18px #000a); }
+.dialogue[data-speaker="mentor"] .mentor, .dialogue[data-speaker="lourenzzo"] .lourenzzo { opacity: 1; filter: drop-shadow(0 6px 18px #000a); }
 .dialogue[data-speaker="mentor"] .mentor { transform: translate(4%, 6%); }
 .dialogue-panel {
   position: relative; z-index: 1; width: 100%; display: grid; min-height: 150px; gap: 8px; padding: clamp(10px, 1.6vw, 20px) clamp(12px, 2vw, 24px);

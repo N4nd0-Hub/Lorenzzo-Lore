@@ -17,15 +17,15 @@ const exercises = [
 ];
 const talks = {
   opening:[
-    ["mentor","Antes de pegar no chicote, quero que entenda por que a Ordem caça, Lorenzzo."],
+    ["mentor","Antes de pegar no chicote, quero que entenda por que a Ordem caça, Lourenzzo."],
     ["mentor","O mar é nosso Deus. Há poderes que mal compreendemos, e há quem os use para pôr a vontade dos outros debaixo da sua."],
     ["mentor","Quando alguém toma esse poder para si e o usa contra os outros, é como tirar algo de Deus sem pedir. É esse abuso que juramos impedir."],
-    ["lorenzzo","E como eu vou saber quando alguém está abusando?"],
+    ["lourenzzo","E como eu vou saber quando alguém está abusando?"],
     ["mentor","Ouvindo quem sofreu as consequências. A arma vem depois. Agora atravesse o riacho. Quero ver como você salta."]
   ],
   whip:[
     ["mentor","Muito bem. Pendurei dois sacos de palha na trilha. Chegue perto e corte as cordas com o chicote."],
-    ["lorenzzo","Os dois? O segundo está bem mais longe."],
+    ["lourenzzo","Os dois? O segundo está bem mais longe."],
     ["mentor","Então caminhe até ele. Aprenda a medir a distância antes de estalar o braço."]
   ],
   shot:[
@@ -33,11 +33,11 @@ const talks = {
     ["mentor","Fique na marca no chão. Inspire, firme as mãos e só então aperte o gatilho. Tem mais cartuchos na caixa."]
   ],
   finish:[
-    ["lorenzzo","Acertei os dois, Padre."],
+    ["lourenzzo","Acertei os dois, Padre."],
     ["mentor","Acertou. Agora guarde a arma. Quem aprende a usar força precisa aprender a hora de baixar a mão também."]
   ]
 };
-const names = {mentor:"Padre Quinn", lorenzzo:"Lorenzzo"};
+const names = {mentor:"Padre Quinn", lourenzzo:"Lourenzzo"};
 const mentorSpots = [250, 700, 1150, 1150];
 const childAtlas = new Image();
 childAtlas.src = "lourenzzo-seminarista.png";

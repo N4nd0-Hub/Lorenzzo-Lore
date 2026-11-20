@@ -1,7 +1,7 @@
 "use strict";
 
 /* ============================================================
-   O Marcado pela Penitência · livro interativo da lore de Lorenzzo
+   O Marcado pela Penitência · livro interativo da lore de Lourenzzo
 
    Para adicionar um capítulo: salve o texto em capitulos/ (mesmo
    formato do 01: 1ª linha = nome, 2ª linha = título, parágrafos
@@ -18,7 +18,7 @@ const NOTAS = [
   { id: "sacerdote", trecho: "sacerdote", titulo: "O sacerdote",
     texto: "Meia-idade, ombros largos. Batina escura rasgada abaixo do joelho e uma queimadura antiga perto do olho esquerdo. Uma arma à cintura e, do outro lado, uma comprida tira de couro enrolada." },
   { id: "emblema", trecho: "pequeno emblema ao peito", titulo: "O emblema",
-    texto: "Os três homens trazem o mesmo emblema no peito. Naquela tarde, Lorenzzo ainda não sabia o que ele significava." },
+    texto: "Os três homens trazem o mesmo emblema no peito. Naquela tarde, Lourenzzo ainda não sabia o que ele significava." },
   { id: "caderno", trecho: "caderno", titulo: "O caderno",
     texto: "Nomes, idades e breves anotações. Serve para saber quem foi encontrado e para onde cada pessoa foi levada." },
   { id: "piratas", trecho: "piratas", titulo: "Piratas",
@@ -30,7 +30,7 @@ const NOTAS = [
   { id: "ordem", trecho: "Ordem da Santa Vigília", titulo: "Ordem da Santa Vigília",
     texto: "Mantém um abrigo em outra ilha, com comida, camas e gente para cuidar dos sobreviventes. Seus membros juram impedir quem usa poderes que mal compreendemos para subjugar os outros." },
   { id: "prato", trecho: "pequeno prato de borda azul", titulo: "O prato de borda azul",
-    texto: "Rachado. Era o prato em que Lorenzzo costumava comer. Seguiu viagem embrulhado num pano, junto com a folha dos nomes." },
+    texto: "Rachado. Era o prato em que Lourenzzo costumava comer. Seguiu viagem embrulhado num pano, junto com a folha dos nomes." },
   { id: "quinn", trecho: "Padre Quinn", titulo: "Padre Quinn",
     texto: "Joaquín. O homem que o tirou dos escombros e fez a viagem com ele. Anos depois, seria o mestre que o treinou na Ordem.",
     imagem: "arte/padre-quinn-busto.png" },
@@ -49,9 +49,9 @@ let paginas = [];
 let unica = false, aberto = false, ocupado = false;
 let atual = 0;             // dupla atual (desktop) ou página atual (celular)
 let revelados = new Set(); // âncoras das páginas já escritas
-let lidas = new Set(ler("lorenzzo-notas", []));
-let vel = ler("lorenzzo-tinta", 1);
-let som = ler("lorenzzo-som", true);
+let lidas = new Set(ler("lourenzzo-notas", []));
+let vel = ler("lourenzzo-tinta", 1);
+let som = ler("lourenzzo-som", true);
 let reveladoAtivo = [];
 let medidas = "";
 
@@ -142,7 +142,7 @@ function rosto() {
   return casca(`<div class="centro">
     <p class="sobre">A história de</p>
     <h2>O Marcado<br><span class="rubro">pela</span> Penitência</h2>
-    <p class="sub">Crônica de Lorenzzo, órfão do mar,<br>e do homem que o encontrou entre os escombros</p>
+    <p class="sub">Crônica de Lourenzzo, órfão do mar,<br>e do homem que o encontrou entre os escombros</p>
     ${EMBLEMA}
     <p class="pe">Ordem da Santa Vigília</p>
   </div>`, { classe: "rosto" });
@@ -466,7 +466,7 @@ function abrirNota(span) {
   caixa.style.left = Math.max(8, Math.min(innerWidth - w - 8, x)) + "px";
   caixa.style.top = Math.max(8, y) + "px";
   if (!lidas.has(nota.id)) {
-    lidas.add(nota.id); guardar("lorenzzo-notas", [...lidas]);
+    lidas.add(nota.id); guardar("lourenzzo-notas", [...lidas]);
     document.querySelectorAll(`.kw[data-nota="${nota.id}"]`).forEach(k => k.classList.add("lida"));
     atualizarContador();
     sino();
@@ -522,8 +522,8 @@ function ligarEventos() {
   $("b-fechar").addEventListener("click", fechar);
   $("b-sumario").addEventListener("click", () => irParaPagina(paginas.findIndex(p => p.ancora === "sumario")));
   $("b-notas").addEventListener("click", () => irParaPagina(paginas.findIndex(p => p.ancora === "notas-0")));
-  $("b-tinta").addEventListener("click", () => { vel = (vel + 1) % VELOCIDADES.length; guardar("lorenzzo-tinta", vel); rotularBotoes(); });
-  $("b-som").addEventListener("click", () => { som = !som; guardar("lorenzzo-som", som); if (som) iniciarAudio(); rotularBotoes(); });
+  $("b-tinta").addEventListener("click", () => { vel = (vel + 1) % VELOCIDADES.length; guardar("lourenzzo-tinta", vel); rotularBotoes(); });
+  $("b-som").addEventListener("click", () => { som = !som; guardar("lourenzzo-som", som); if (som) iniciarAudio(); rotularBotoes(); });
   $("nota-x").addEventListener("click", fecharNota);
 
   for (const lado of ["p-esq", "p-dir"]) {

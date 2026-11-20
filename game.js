@@ -40,7 +40,7 @@ function setMode(next) {
   }
   el("prompt").hidden = true;
   const views = {
-    title:["Prólogo · West Blue", "O treino na floresta", "Anos depois do incêndio, Lorenzzo vive sob os cuidados da Ordem da Santa Vigília. Hoje, Padre Quinn vai ensiná-lo a lutar.", "Começar"],
+    title:["Prólogo · West Blue", "O treino na floresta", "Anos depois do incêndio, Lourenzzo vive sob os cuidados da Ordem da Santa Vigília. Hoje, Padre Quinn vai ensiná-lo a lutar.", "Começar"],
     paused:["Pausa", "Treino pausado", "Retome quando quiser.", "Continuar"],
     won:["Fim do prólogo", "Treino concluído", "“Quem aprende a usar força precisa aprender a hora de baixar a mão também.”", "Treinar de novo"]
   };

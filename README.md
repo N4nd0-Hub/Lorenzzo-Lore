@@ -1,6 +1,6 @@
 # O Marcado pela Penitência
 
-A lore de Lorenzzo em forma de livro: capa de couro, páginas de pergaminho e um texto que se escreve enquanto você lê. Junto vem o prólogo jogável, o treino na floresta com Padre Quinn.
+A lore de Lourenzzo em forma de livro: capa de couro, páginas de pergaminho e um texto que se escreve enquanto você lê. Junto vem o prólogo jogável, o treino na floresta com Padre Quinn.
 
 - `index.html`: o livro
 - `jogo.html`: o prólogo jogável
