@@ -2,101 +2,142 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#120f14">
-  <meta name="description" content="Conheça o passado de Lourenzzo Montenegro no West Blue e explore a Capela do Sino Mudo.">
-  <title>Lourenzzo Montenegro · Prólogo e Capela</title>
-  <link rel="stylesheet" href="style.css?v=0.3">
-  <script defer src="chicote.js?v=0.4"></script>
-  <script defer src="floresta.js?v=0.4"></script>
-  <script defer src="game.js?v=0.4"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120b0a">
+  <meta name="description" content="O Marcado pela Penitência — a história de Lorenzzo, contada em um livro que se escreve enquanto você lê.">
+  <title>O Marcado pela Penitência · Lorenzzo</title>
+  <link rel="preload" href="livro/fontes/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="livro/livro.css?v=1">
+  <script defer src="livro/livro.js?v=1"></script>
 </head>
 <body>
-<main class="shell">
-  <header class="masthead">
-    <div class="brand">
-      <span class="sigil" aria-hidden="true">✦</span>
-      <div><strong>LOURENZZO</strong><span>MONTENEGRO</span></div>
-    </div>
-    <span class="edition">PROTÓTIPO JOGÁVEL <b>01</b></span>
+  <div class="luz" aria-hidden="true"></div>
+
+  <header class="barra" id="barra" hidden>
+    <button type="button" id="b-sumario" title="Ir para o sumário">Sumário</button>
+    <button type="button" id="b-notas" title="Notas do caderno">Notas <span id="n-notas">0/0</span></button>
+    <button type="button" id="b-tinta" title="Velocidade em que a tinta aparece">Tinta: normal</button>
+    <button type="button" id="b-som" aria-pressed="true" title="Som das páginas">Som ligado</button>
+    <a href="jogo.html" class="b-jogo">Jogar o prólogo ↗</a>
+    <button type="button" id="b-fechar" title="Fechar o livro">Fechar</button>
   </header>
 
-  <section class="heading">
-    <div><p class="eyebrow" id="chapter-tag">PRÓLOGO <span></span> <b id="chapter-place">WEST BLUE</b></p><h1 id="chapter-title">O Treino na Floresta</h1></div>
-    <div class="toolbar">
-      <button id="sound" type="button" aria-pressed="false" title="Ativar ou silenciar os efeitos sonoros">Som desligado</button>
-      <button id="fullscreen" type="button" title="Tela cheia">Tela cheia</button>
-      <button id="pause" type="button" title="Pausar a partida" disabled>Pausar</button>
+  <main class="cena" id="cena">
+    <h1 class="sr-only">O Marcado pela Penitência — a história de Lorenzzo</h1>
+    <div class="livro fechado" id="livro">
+      <div class="lombada-sombra" aria-hidden="true"></div>
+      <section class="pagina esq" id="p-esq" aria-label="Página da esquerda"></section>
+      <section class="pagina dir" id="p-dir" aria-label="Página da direita" aria-live="polite"></section>
+
+      <div class="folha" id="folha" aria-hidden="true" hidden>
+        <div class="face frente pagina dir" id="folha-frente"></div>
+        <div class="face verso pagina esq" id="folha-verso"></div>
+      </div>
+
+      <button class="capa" id="capa" type="button" aria-label="Abrir o livro">
+        <span class="face frente capa-frente">
+          <svg class="capa-arte" viewBox="0 0 700 1000" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="ouro" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f6e3a1"/><stop offset=".35" stop-color="#c79a3f"/>
+                <stop offset=".55" stop-color="#fff0b8"/><stop offset=".8" stop-color="#a87a2a"/><stop offset="1" stop-color="#e9c977"/>
+              </linearGradient>
+              <linearGradient id="latao" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#e8cf8a"/><stop offset=".45" stop-color="#8f6a2c"/><stop offset=".7" stop-color="#d9b46a"/><stop offset="1" stop-color="#5d4119"/>
+              </linearGradient>
+              <filter id="relevo" x="-5%" y="-5%" width="110%" height="110%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/>
+                <feSpecularLighting in="b" surfaceScale="3" specularConstant=".9" specularExponent="18" lighting-color="#fff6d8" result="s">
+                  <feDistantLight azimuth="235" elevation="38"/>
+                </feSpecularLighting>
+                <feComposite in="s" in2="SourceAlpha" operator="in" result="s2"/>
+                <feComposite in="SourceGraphic" in2="s2" operator="arithmetic" k1="0" k2="1" k3=".55" k4="0" result="lit"/>
+                <feDropShadow dx="1.2" dy="2" stdDeviation="1" flood-color="#1a0605" flood-opacity=".85"/>
+              </filter>
+              <filter id="baixo" x="-5%" y="-5%" width="110%" height="110%">
+                <feOffset dx="-1.5" dy="-1.5" in="SourceAlpha" result="o1"/>
+                <feComposite in="SourceAlpha" in2="o1" operator="out" result="sombra"/>
+                <feFlood flood-color="#120303" flood-opacity=".9"/><feComposite in2="sombra" operator="in" result="s1"/>
+                <feOffset dx="1.5" dy="1.5" in="SourceAlpha" result="o2"/>
+                <feComposite in="SourceAlpha" in2="o2" operator="out" result="brilho"/>
+                <feFlood flood-color="#c76f5c" flood-opacity=".35"/><feComposite in2="brilho" operator="in" result="s2"/>
+                <feMerge><feMergeNode in="s1"/><feMergeNode in="s2"/></feMerge>
+              </filter>
+              <g id="canto">
+                <path d="M0 0 L150 0 Q120 14 112 40 Q90 30 70 44 Q72 70 44 74 Q30 92 40 112 Q14 120 0 150 Z" fill="url(#latao)" stroke="#3b2608" stroke-width="2"/>
+                <path d="M10 10 L118 10 Q98 22 94 40 Q76 36 60 54 Q56 76 40 78 Q22 98 22 118 Q12 112 10 118 Z" fill="none" stroke="#fff0c0" stroke-opacity=".45" stroke-width="1.5"/>
+                <circle cx="36" cy="36" r="9" fill="url(#ouro)" stroke="#3b2608" stroke-width="2"/>
+                <circle cx="33" cy="33" r="3" fill="#fff8dc" opacity=".7"/>
+              </g>
+              <g id="flor">
+                <path d="M0 0 C 14 -18 34 -18 40 -4 C 30 -10 18 -6 14 4 C 26 0 36 8 32 20 C 26 10 12 8 0 0 Z"/>
+              </g>
+            </defs>
+            <g filter="url(#baixo)" fill="#000" opacity=".9">
+              <rect x="86" y="96" width="528" height="808" rx="4" fill="none" stroke="#000" stroke-width="10"/>
+              <rect x="120" y="132" width="460" height="736" rx="2" fill="none" stroke="#000" stroke-width="3"/>
+            </g>
+            <g filter="url(#relevo)" fill="url(#ouro)">
+              <rect x="56" y="64" width="588" height="872" fill="none" stroke="url(#ouro)" stroke-width="3"/>
+              <rect x="68" y="76" width="564" height="848" fill="none" stroke="url(#ouro)" stroke-width="1.2"/>
+              <use href="#flor" transform="translate(96 104)"/>
+              <use href="#flor" transform="translate(604 104) scale(-1 1)"/>
+              <use href="#flor" transform="translate(96 896) scale(1 -1)"/>
+              <use href="#flor" transform="translate(604 896) scale(-1 -1)"/>
+              <g transform="translate(350 548)">
+                <circle r="96" fill="none" stroke="url(#ouro)" stroke-width="6"/>
+                <circle r="84" fill="none" stroke="url(#ouro)" stroke-width="1.6"/>
+                <path d="M-11 -74 H11 V-28 H46 V-6 H11 V36 H-11 V-6 H-46 V-28 H-11 Z"/>
+                <path d="M-72 40 q12 -12 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 v8 q-12 -12 -24 0 t-24 0 t-24 0 t-24 0 t-24 0 t-24 0 Z"/>
+                <path d="M-62 60 q12 -12 24 0 t24 0 t24 0 t24 0 t24 0 v7 q-12 -12 -24 0 t-24 0 t-24 0 t-24 0 t-24 0 Z"/>
+                <g fill="none" stroke="url(#ouro)" stroke-width="2">
+                  <path d="M0 -96 V-122 M-8 -114 H8"/><path d="M0 96 V116"/>
+                </g>
+                <circle cy="128" r="5"/>
+              </g>
+              <path d="M200 382 H500 M230 394 H470" stroke="url(#ouro)" stroke-width="2"/>
+              <path d="M180 760 H520 M210 772 H490" stroke="url(#ouro)" stroke-width="2"/>
+              <path d="M350 372 l8 8 -8 8 -8 -8 Z M350 764 l8 8 -8 8 -8 -8 Z"/>
+            </g>
+            <use href="#canto"/>
+            <use href="#canto" transform="translate(700 0) scale(-1 1)"/>
+            <use href="#canto" transform="translate(0 1000) scale(1 -1)"/>
+            <use href="#canto" transform="translate(700 1000) scale(-1 -1)"/>
+          </svg>
+          <span class="capa-titulo">
+            <span class="t1">O Marcado</span>
+            <span class="t2">pela</span>
+            <span class="t3">Penitência</span>
+          </span>
+          <span class="capa-nome">Lorenzzo</span>
+          <span class="capa-dica">Toque para abrir</span>
+        </span>
+        <span class="face verso guarda">
+          <span class="ex-libris">
+            <span class="ex-l1">Ex Libris</span>
+            <svg viewBox="-60 -70 120 140" aria-hidden="true"><g fill="#6b1e18"><path d="M-6 -50 H6 V-20 H30 V-8 H6 V26 H-6 V-8 H-30 V-20 H-6 Z"/><path d="M-48 32 q8 -8 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 v6 q-8 -8 -16 0 t-16 0 t-16 0 t-16 0 t-16 0 t-16 0 Z"/></g><circle r="62" fill="none" stroke="#6b1e18" stroke-width="2"/></svg>
+            <span class="ex-l2">Lorenzzo</span>
+            <span class="ex-l3">Ordem da Santa Vigília</span>
+          </span>
+        </span>
+      </button>
+
+      <div class="fita" aria-hidden="true"></div>
     </div>
-  </section>
 
-  <div class="layout">
-    <section class="play" id="play" aria-label="Área do jogo">
-      <div class="frame">
-        <div id="frame-content">
-        <canvas id="game" width="960" height="540" aria-label="Metroidvania em pixel art" tabindex="0"></canvas>
-        <div class="hud" aria-label="Estado da partida">
-          <div class="hud-group"><span>VIDA</span><div id="health" aria-label="5 de 5 de vida"></div></div>
-          <div class="hud-group"><span>MUNIÇÃO</span><div id="ammo" aria-label="5 de 5 cartuchos"></div></div>
-        </div>
-        <div id="prompt" class="prompt" hidden></div>
-        <div id="toast" class="toast" role="status" hidden></div>
-        <div id="overlay" class="overlay">
-          <div class="overlay-card">
-            <span class="emblem" aria-hidden="true">✧</span>
-            <p id="overlay-kicker" class="eyebrow">LOURENZZO MONTENEGRO</p>
-            <h2 id="overlay-title">O primeiro treino</h2>
-            <p id="overlay-text">West Blue. Antes da capela, Lourenzzo ainda era seminarista.</p>
-            <button id="primary" type="button">Começar prólogo <span>↗</span></button>
-            <button id="chapter-skip" class="text-button" type="button">Ir direto à capela</button>
-            <button id="reset" class="text-button" type="button" hidden>Recomeçar partida</button>
-          </div>
-        </div>
-        </div>
-        <section id="dialogue" class="dialogue" aria-modal="true" role="dialog" aria-labelledby="speaker" aria-describedby="dialogue-line" data-speaker="mentor" hidden>
-          <div class="dialogue-portraits" aria-hidden="true">
-            <img class="portrait lourenzzo" src="retrato-lourenzzo.png" alt=""><img class="portrait mentor" src="retrato-mentor.png" alt="">
-          </div>
-          <div class="dialogue-panel">
-            <div class="dialogue-meta"><h2 id="speaker">Mestre da Ordem</h2><span id="dialogue-count"></span></div>
-            <p id="dialogue-line" aria-live="polite"></p>
-            <button id="dialogue-next" type="button" aria-keyshortcuts="E Enter Space">Continuar →</button>
-          </div>
-        </section>
-      </div>
-      <div class="frame-footer"><span><i></i> <b id="location">Trilha da Ordem</b></span><span id="checkpoint">Exercício 1 de 3</span></div>
-      <div class="touch" id="touch-controls" aria-label="Controles de toque">
-        <div><button data-key="ArrowLeft" aria-label="Esquerda">◀</button><button data-key="ArrowRight" aria-label="Direita">▶</button></div>
-        <div><button data-key="KeyE">Interagir</button><button data-key="KeyJ">Chicote</button><button data-key="KeyK">Tiro</button><button data-key="ShiftLeft">Dash</button><button data-key="Space">Pular</button></div>
-      </div>
-    </section>
+    <button class="seta ant" id="ant" type="button" aria-label="Página anterior" hidden>‹</button>
+    <button class="seta prox" id="prox" type="button" aria-label="Próxima página" hidden>›</button>
+    <p class="dica-leitura" id="dica" hidden>Toque na página para terminar de escrever · setas para virar</p>
+  </main>
 
-    <aside class="field">
-      <section class="field-panel objective">
-        <p class="eyebrow"><span class="index">01</span> OBJETIVO</p>
-        <h2 id="objective-title">Atravesse o riacho</h2>
-        <p id="objective-text">Siga para a direita e pule com Espaço antes da margem.</p>
-        <p class="training-step" id="training-step" hidden></p>
-        <div class="map" aria-label="Mapa de regiões">
-          <i id="map-marker" aria-hidden="true"></i>
-          <span class="map-node active" data-zone="0">Átrio</span><span class="map-node" data-zone="1">Nave</span><span class="map-node" data-zone="2">Cripta</span>
-        </div>
-      </section>
-      <section class="field-panel">
-        <p class="eyebrow"><span class="index">02</span> CONTROLES</p>
-        <dl class="controls">
-          <div><dt>Mover</dt><dd><kbd>A</kbd><kbd>D</kbd><small>ou</small><kbd>←</kbd><kbd>→</kbd></dd></div>
-          <div><dt>Pular</dt><dd><kbd>Espaço</kbd></dd></div>
-          <div><dt>Chicote</dt><dd><kbd>J</kbd></dd></div>
-          <div><dt>Pistola-cruz</dt><dd><kbd>K</kbd></dd></div>
-          <div><dt>Interagir</dt><dd><kbd>E</kbd></dd></div>
-          <div id="dash-guide" class="locked"><dt>Dash aéreo</dt><dd><kbd>Shift</kbd></dd></div>
-        </dl>
-      </section>
-      <p class="field-note" id="field-note">Floresta do West Blue · Anos antes da campanha.</p>
-    </aside>
+  <div class="nota" id="nota" role="dialog" aria-modal="false" aria-labelledby="nota-titulo" hidden>
+    <button type="button" class="nota-x" id="nota-x" aria-label="Fechar nota">×</button>
+    <p class="nota-tag">Anotação</p>
+    <h2 id="nota-titulo"></h2>
+    <p id="nota-texto"></p>
   </div>
-  <footer class="credits"><span>◇</span> LOURENZZO MONTENEGRO <span>·</span> PROTÓTIPO 0.4</footer>
-</main>
+
+  <div class="medidor" id="medidor" aria-hidden="true"></div>
+  <noscript><p class="sem-js">Este livro precisa de JavaScript para ser folheado.</p></noscript>
 </body>
 </html>
