@@ -81,6 +81,9 @@ button:focus-visible, a:focus-visible { outline: 2px solid #e8c47a; outline-offs
 .face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .livro.fechado > .pagina { visibility: hidden; }
 .livro.aberto:not(.unica) .capa { visibility: hidden; }
+.livro:not(.aberto):not(.unica) > #p-esq { visibility: hidden; }
+.livro:not(.aberto):not(.unica)::before { opacity: 0; }
+.livro::before { transition: opacity .25s ease; }
 .pagina.guarda-pag { background: radial-gradient(ellipse 110% 90% at 50% 50%, #0000 50%, #0000004d 100%), linear-gradient(270deg, #0000008c, #0000 12%), url("guarda.jpg") center / cover, #2a1512; display: grid; place-items: center; }
 .pagina.guarda-pag .ex-libris { position: relative; }
 .pagina.dir.guarda-pag { background: radial-gradient(ellipse 110% 90% at 50% 50%, #0000 50%, #0000004d 100%), linear-gradient(90deg, #0000008c, #0000 12%), url("guarda.jpg") center / cover, #2a1512; }
