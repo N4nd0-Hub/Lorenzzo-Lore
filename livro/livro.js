@@ -16,23 +16,23 @@ const CAPITULOS = [
 
 const NOTAS = [
   { id: "sacerdote", trecho: "sacerdote", titulo: "O sacerdote",
-    texto: "Meia-idade, ombros largos. Batina escura rasgada abaixo do joelho e uma queimadura antiga perto do olho esquerdo. Uma arma à cintura e, do outro lado, uma comprida tira de couro enrolada." },
+    texto: "A primeira vez que o vi. A batina rasgada, a queimadura no olho, a arma na cintura. Recuei com medo, sem saber que estava diante do homem que mudaria a minha vida." },
   { id: "emblema", trecho: "pequeno emblema ao peito", titulo: "O emblema",
-    texto: "Os três homens trazem o mesmo emblema no peito. Naquela tarde, Lourenzzo ainda não sabia o que ele significava." },
+    texto: "Os três traziam o mesmo emblema no peito. Naquela tarde eu não sabia o que ele significava. Hoje carrego o mesmo." },
   { id: "caderno", trecho: "caderno", titulo: "O caderno",
-    texto: "Nomes, idades e breves anotações. Serve para saber quem foi encontrado e para onde cada pessoa foi levada." },
+    texto: "Ele anotava o nome de cada pessoa que encontrava. Escreveu o dos meus pais também. Foi a primeira vez que alguém prometeu não esquecê-los." },
   { id: "piratas", trecho: "piratas", titulo: "Piratas",
-    texto: "A palavra que corria entre os sobreviventes naquela noite. Ninguém disse quais." },
+    texto: "Ouvi essa palavra naquela noite, entre a fumaça e o choro dos outros. Nunca mais a esqueci." },
   { id: "demonio", trecho: "demônio perto do porto", titulo: "O demônio do porto",
-    texto: "Um dos moradores jurou ter visto. Cada pessoa conhecia uma parte diferente do que aconteceu." },
+    texto: "Alguém jurou ter visto um demônio no porto. Eu estava cansado demais para entender. Hoje me pergunto o que ele viu." },
   { id: "oracao", trecho: "O mar acolhe toda criatura nascida sob os céus", titulo: "A oração",
-    texto: "Repetida em cada sepultamento. A Ordem acredita que o mar cuida das pessoas." },
+    texto: "O Padre repetiu essa oração em cada sepultamento. Foi a primeira vez que ouvi alguém dizer que o mar cuida das pessoas." },
   { id: "ordem", trecho: "Ordem da Santa Vigília", titulo: "Ordem da Santa Vigília",
-    texto: "Mantém um abrigo em outra ilha, com comida, camas e gente para cuidar dos sobreviventes. Seus membros juram impedir quem usa poderes que mal compreendemos para subjugar os outros." },
+    texto: "Foram eles que me deram comida, uma cama e um lugar para onde ir. Juramos impedir quem usa poderes que mal compreendemos para subjugar os outros." },
   { id: "prato", trecho: "pequeno prato de borda azul", titulo: "O prato de borda azul",
-    texto: "Rachado. Era o prato em que Lourenzzo costumava comer. Seguiu viagem embrulhado num pano, junto com a folha dos nomes." },
+    texto: "Rachado, mas era meu. Foi a única coisa que levei da minha casa, embrulhada num pano junto com a folha dos nomes." },
   { id: "quinn", trecho: "Padre Quinn", titulo: "Padre Quinn",
-    texto: "Joaquín. O homem que o tirou dos escombros e fez a viagem com ele. Anos depois, seria o mestre que o treinou na Ordem.",
+    texto: "Meu mestre. Aquele que me salvou e me treinou para ser quem eu sou hoje.",
     imagem: "arte/padre-quinn-busto.png" },
 ];
 
@@ -157,7 +157,7 @@ function sumario() {
   }).join("");
   const notas = paginas.findIndex(p => p.ancora === "notas-0");
   return casca(`<h2>Sumário</h2>${ORNAMENTO}<ol>${itens}
-    <li><button type="button" data-ir="${notas}"><span class="rom">✠</span><span>Notas do caderno</span><span class="pont"></span><span>${notas + 1}</span></button></li>
+    <li><button type="button" data-ir="${notas}"><span class="rom">✠</span><span>Anotações de Lourenzzo</span><span class="pont"></span><span>${notas + 1}</span></button></li>
     <li class="jogo-item"><a href="jogo.html"><span class="rom">▸</span><span>Prólogo jogável: o treino na floresta</span><span class="pont"></span><span>↗</span></a></li>
   </ol>`, { classe: "sumario" });
 }
@@ -231,8 +231,8 @@ function paginar() {
     }
   }
 
-  // notas do caderno (paginadas com todas visíveis)
-  const notasHtml = (de, ate) => `${de === 0 ? `<h2>Notas do caderno</h2><p class="dica-notas">Toque nas palavras marcadas com ✠ para encontrá-las</p>` : ""}<ul>${NOTAS.slice(de, ate).map(n =>
+  // anotações de Lourenzzo (paginadas com todas visíveis)
+  const notasHtml = (de, ate) => `${de === 0 ? `<h2>Anotações de Lourenzzo</h2><p class="dica-notas">Toque nas palavras marcadas com ✠ para encontrá-las</p>` : ""}<ul>${NOTAS.slice(de, ate).map(n =>
     lidas.has(n.id) ? `<li><b>${esc(n.titulo)}</b>${esc(n.texto)}</li>` : `<li class="oculta"><b>${esc(n.titulo)}</b>Ainda não encontrada.</li>`).join("")}</ul>`;
   let ini = 0, k = 0;
   while (ini < NOTAS.length) {

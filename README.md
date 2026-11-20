@@ -12,7 +12,7 @@ A lore de Lourenzzo em forma de livro: capa de couro, páginas de pergaminho e u
 
 ## Como criar uma nota clicável
 
-Na lista `NOTAS` (também em `livro/livro.js`), acrescente um item com `trecho` escrito exatamente como aparece no texto. A primeira ocorrência desse trecho vira uma palavra marcada com ✠, e a nota passa a contar em "Notas do caderno".
+Na lista `NOTAS` (também em `livro/livro.js`), acrescente um item com `trecho` escrito exatamente como aparece no texto. A primeira ocorrência desse trecho vira uma palavra marcada com ✠, e a nota passa a contar em "Anotações de Lourenzzo". Escreva as notas na voz do Lourenzzo, em primeira pessoa.
 
 ## Créditos
 
