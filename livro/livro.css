@@ -1,0 +1,345 @@
+/* Fontes livres (SIL OFL) servidas localmente */
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 400; font-display: swap; src: url("fontes/eb-garamond-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: italic; font-weight: 400; font-display: swap; src: url("fontes/eb-garamond-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-style: normal; font-weight: 500; font-display: swap; src: url("fontes/eb-garamond-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 400; font-display: swap; src: url("fontes/cinzel-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Cinzel"; font-style: normal; font-weight: 600; font-display: swap; src: url("fontes/cinzel-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "IM Fell English"; font-style: normal; font-weight: 400; font-display: swap; src: url("fontes/im-fell-english-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "IM Fell English"; font-style: italic; font-weight: 400; font-display: swap; src: url("fontes/im-fell-english-latin-400-italic.woff2") format("woff2"); }
+@font-face { font-family: "UnifrakturMaguntia"; font-style: normal; font-weight: 400; font-display: swap; src: url("fontes/unifrakturmaguntia-latin-400-normal.woff2") format("woff2"); }
+:root {
+  --tinta: #2b1a12;
+  --rubrica: #8e1f17;
+  --ouro: #c9a14f;
+  --vel: 14ms;
+  --pw: 520px;
+  --ph: 740px;
+  --fs: 17px;
+  --virar: 900ms;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; overflow: hidden; color: #eadbc0;
+  font-family: "EB Garamond", Garamond, Georgia, serif;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 46%, #3a2318 0%, #1d110d 55%, #0b0605 100%),
+    #0b0605;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(92deg, #0000 0 14px, #ffffff05 14px 15px, #0000 15px 37px, #00000014 37px 39px);
+}
+.luz {
+  position: fixed; inset: -20%; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle at 50% 30%, #ffb46a22, #0000 45%);
+  animation: vela 4.2s ease-in-out infinite alternate;
+}
+@keyframes vela { 0% { opacity: .55; transform: translate(0,0); } 30% { opacity: .9; } 60% { opacity: .7; transform: translate(.6%,-.4%); } 100% { opacity: 1; transform: translate(-.4%,.3%); } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 2px solid #e8c47a; outline-offset: 3px; }
+
+/* ---------- Barra ---------- */
+.barra {
+  position: fixed; z-index: 30; top: 10px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; width: max-content; max-width: calc(100% - 16px);
+  animation: surgir .8s ease both .4s;
+}
+.barra button, .barra a {
+  font: 600 10.5px "Cinzel", serif; letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
+  color: #e8d3a8; background: #1a0f0bcc; border: 1px solid #6b4a2b; border-radius: 2px; padding: 7px 10px;
+  backdrop-filter: blur(4px);
+}
+.barra button:hover, .barra a:hover { border-color: #d6ad62; color: #fff1cf; }
+.barra .b-jogo { color: #f3d58f; border-color: #a77c3a; }
+@keyframes surgir { from { opacity: 0; transform: translate(-50%,-8px); } }
+
+/* ---------- Cena e livro ---------- */
+.cena { position: fixed; inset: 0; display: grid; place-items: center; perspective: 2600px; }
+.livro {
+  position: relative; width: calc(var(--pw) * 2); height: var(--ph);
+  transform-style: preserve-3d; transition: transform 1.1s cubic-bezier(.6,.05,.25,1);
+}
+.livro.fechado { transform: translateX(calc(var(--pw) * -.5)) rotateX(6deg); }
+.livro.fechado:hover { transform: translateX(calc(var(--pw) * -.5)) rotateX(3deg) rotateY(-4deg); }
+.livro.unica { width: var(--pw); }
+.livro.unica.fechado { transform: rotateX(4deg); }
+
+.pagina {
+  position: absolute; top: 0; width: var(--pw); height: var(--ph); overflow: hidden;
+  color: var(--tinta);
+  background-color: #e8d9b9;
+  background-image:
+    var(--sombra-lombada),
+    radial-gradient(ellipse 120% 90% at 50% 50%, #0000 62%, #6d4a2233 100%),
+    url("pergaminho.jpg");
+  background-size: 100% 100%, 100% 100%, cover;
+}
+.face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.livro.fechado > .pagina { visibility: hidden; }
+.livro.aberto:not(.unica) .capa { visibility: hidden; }
+.pagina.guarda-pag { background: radial-gradient(ellipse 110% 90% at 50% 50%, #0000 50%, #0000004d 100%), linear-gradient(270deg, #0000008c, #0000 12%), url("guarda.jpg") center / cover, #2a1512; display: grid; place-items: center; }
+.pagina.guarda-pag .ex-libris { position: relative; }
+.pagina.dir.guarda-pag { background: radial-gradient(ellipse 110% 90% at 50% 50%, #0000 50%, #0000004d 100%), linear-gradient(90deg, #0000008c, #0000 12%), url("guarda.jpg") center / cover, #2a1512; }
+.pagina.esq { left: 0; --sombra-lombada: linear-gradient(270deg, #3a22104d 0%, #3a221014 4%, #0000 12%, #0000 97%, #3a22102e 100%); border-radius: 4px 0 0 4px; }
+.pagina.dir { left: var(--pw); --sombra-lombada: linear-gradient(90deg, #3a22104d 0%, #3a221014 4%, #0000 12%, #0000 97%, #3a22102e 100%); border-radius: 0 4px 4px 0; }
+.livro.unica .pagina.dir { left: 0; }
+.livro.unica .pagina.esq:not(.face) { display: none; }
+
+/* bloco de folhas: espessura e cortes dourados */
+.livro::before, .livro::after {
+  content: ""; position: absolute; top: 3px; bottom: -7px; width: var(--pw); z-index: -1;
+  background: repeating-linear-gradient(0deg, #d9c495 0 1px, #b8a072 1px 2px);
+  box-shadow: 0 30px 60px -10px #000c, 0 10px 18px #0009;
+}
+.livro::before { left: -6px; border-radius: 6px 0 0 6px; }
+.livro::after { right: -6px; border-radius: 0 6px 6px 0; }
+.livro.fechado::before { opacity: 0; }
+.livro.unica::before { display: none; }
+.livro.unica::after { right: -6px; }
+.livro.fechado::after { right: -9px; top: 6px; bottom: -9px; background: linear-gradient(90deg, #8a6a2c, #e7c979 30%, #b28a3e 60%, #f2dc95); }
+.lombada-sombra {
+  position: absolute; z-index: 5; left: calc(var(--pw) - 30px); width: 60px; top: 0; height: 100%; pointer-events: none;
+  background: linear-gradient(90deg, #0000, #2a170a40 40%, #1d0f0666 50%, #2a170a40 60%, #0000);
+}
+.livro.fechado .lombada-sombra, .livro.unica .lombada-sombra { display: none; }
+
+/* ---------- Capa ---------- */
+.capa {
+  position: absolute; z-index: 20; top: -8px; left: calc(var(--pw) - 4px);
+  width: calc(var(--pw) + 12px); height: calc(var(--ph) + 16px);
+  padding: 0; border: 0; background: none; transform-origin: 4px 50%; transform-style: preserve-3d;
+  transition: transform 1.25s cubic-bezier(.6,.02,.3,1);
+}
+.livro.unica .capa { left: -4px; }
+.livro:not(.fechado) .capa { transform: rotateY(-179.5deg); cursor: default; }
+.livro.unica:not(.fechado) .capa { transform: rotateY(-120deg); opacity: 0; pointer-events: none; transition: transform 1.1s ease, opacity .5s ease .6s; }
+.capa .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 3px 10px 10px 3px; overflow: hidden; }
+.capa-frente {
+  display: block;
+  background:
+    radial-gradient(ellipse 80% 60% at 38% 30%, #ffffff1c, #0000 60%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, #0000 55%, #0a0101b3 100%),
+    linear-gradient(90deg, #00000080 0, #ffffff12 2.4%, #00000066 4.2%, #0000 7%),
+    url("couro.jpg") center / cover, #4d1714;
+  box-shadow: inset 0 0 0 1px #00000099, inset 0 0 22px #000000a6, 0 30px 70px -10px #000;
+}
+.capa-arte { position: absolute; inset: 0; width: 100%; height: 100%; }
+.capa-titulo {
+  position: absolute; left: 0; right: 0; top: 13.5%; display: grid; justify-items: center; text-align: center;
+  font-family: "UnifrakturMaguntia", "Cinzel", serif; line-height: .95;
+}
+.capa-titulo span, .capa-nome, .ex-l1 {
+  background: linear-gradient(170deg, #fff2bf 0%, #d9ae55 30%, #8c6223 50%, #f3d685 66%, #a57a2e 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(1px 1.5px 0 #1d0504) drop-shadow(0 0 1px #00000099);
+}
+.capa-titulo .t1 { font-size: calc(var(--pw) * .118); }
+.capa-titulo .t2 { font-size: calc(var(--pw) * .07); margin: .1em 0; }
+.capa-titulo .t3 { font-size: calc(var(--pw) * .13); }
+.capa-nome {
+  position: absolute; left: 0; right: 0; bottom: 13.2%; text-align: center;
+  font: 600 calc(var(--pw) * .038) "Cinzel", serif; letter-spacing: .5em; text-indent: .5em; text-transform: uppercase;
+}
+.capa-dica {
+  position: absolute; left: 0; right: 0; bottom: -40px; text-align: center; color: #d8bf91;
+  font: italic 15px "IM Fell English", serif; letter-spacing: .05em; animation: pulsar 2.4s ease-in-out infinite;
+}
+.livro:not(.fechado) .capa-dica { display: none; }
+@keyframes pulsar { 50% { opacity: .35; } }
+.capa .verso { transform: rotateY(180deg); }
+.guarda {
+  display: grid; place-items: center;
+  background:
+    radial-gradient(ellipse 110% 90% at 50% 50%, #0000 50%, #0000004d 100%),
+    url("guarda.jpg") center / cover, #2a1512;
+  box-shadow: inset -18px 0 30px #0000008c;
+}
+.ex-libris {
+  width: 58%; padding: 22px 18px 18px; display: grid; justify-items: center; gap: 6px; text-align: center;
+  background: url("pergaminho.jpg") center / cover, #e9dcbf; color: #6b1e18;
+  border: 1px solid #6b1e18; outline: 6px double #e9dcbf; box-shadow: 0 6px 18px #000000a6;
+}
+.ex-libris svg { width: 38%; }
+.ex-l1 { font: calc(var(--pw) * .06) "UnifrakturMaguntia", serif; filter: none; background: none; color: #6b1e18; }
+.ex-l2 { font: italic calc(var(--pw) * .055) "IM Fell English", serif; color: #2b1a12; border-bottom: 1px solid #6b1e1866; padding: 0 20px 2px; }
+.ex-l3 { font: 600 calc(var(--pw) * .022) "Cinzel", serif; letter-spacing: .2em; text-transform: uppercase; }
+
+/* fita marcadora */
+.fita {
+  position: absolute; z-index: -2; left: calc(var(--pw) + 18px); bottom: -64px; width: 16px; height: 120px;
+  background: linear-gradient(90deg, #5e0d0d, #a3201b 40%, #7b1512); clip-path: polygon(0 0,100% 0,100% 100%,50% 86%,0 100%);
+  box-shadow: 2px 3px 6px #0008; transform-origin: top; animation: balanca 6s ease-in-out infinite;
+}
+.livro.fechado .fita { left: auto; right: 60px; }
+.livro.unica .fita { left: 24px; }
+@keyframes balanca { 50% { transform: rotate(2.5deg); } }
+
+/* ---------- Folha virando ---------- */
+.folha {
+  position: absolute; z-index: 12; top: 0; left: var(--pw); width: var(--pw); height: var(--ph);
+  transform-origin: 0 50%; transform-style: preserve-3d; pointer-events: none;
+}
+.livro.unica .folha { left: 0; }
+.folha .face { position: absolute; inset: 0; left: 0; }
+.folha .verso { transform: rotateY(180deg); }
+.folha::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, #0000 40%, #3b23113d 80%, #3b231166); backface-visibility: hidden;
+}
+.folha.indo { animation: virar var(--virar) cubic-bezier(.45,.05,.3,1) forwards; }
+.folha.voltando { animation: desvirar var(--virar) cubic-bezier(.45,.05,.3,1) forwards; }
+.folha.indo::after, .folha.voltando::after { animation: sombra-folha var(--virar) ease forwards; }
+.livro.unica .folha.indo { animation-name: virar-unica; }
+.livro.unica .folha.voltando { animation-name: desvirar-unica; }
+@keyframes virar { from { transform: rotateY(0); } 50% { transform: rotateY(-90deg) skewY(-1.5deg); } to { transform: rotateY(-180deg); } }
+@keyframes desvirar { from { transform: rotateY(-180deg); } 50% { transform: rotateY(-90deg) skewY(1.5deg); } to { transform: rotateY(0); } }
+@keyframes virar-unica { from { transform: rotateY(0); opacity: 1; } 70% { opacity: 1; } to { transform: rotateY(-110deg); opacity: 0; } }
+@keyframes desvirar-unica { from { transform: rotateY(-110deg); opacity: 0; } 30% { opacity: 1; } to { transform: rotateY(0); opacity: 1; } }
+@keyframes sombra-folha { 50% { opacity: 1; } }
+
+/* ---------- Conteúdo das páginas ---------- */
+.miolo {
+  position: absolute; inset: 0; padding: calc(var(--ph) * .075) calc(var(--pw) * .115) calc(var(--ph) * .07);
+  display: flex; flex-direction: column; font-size: var(--fs);
+}
+.esq .miolo { padding-right: calc(var(--pw) * .13); }
+.dir .miolo { padding-left: calc(var(--pw) * .13); }
+.cabeca {
+  display: flex; justify-content: center; gap: 10px; align-items: center; margin-bottom: calc(var(--ph) * .025);
+  font: 600 calc(var(--fs) * .56) "Cinzel", serif; letter-spacing: .24em; text-transform: uppercase; color: #6d4a33;
+  border-bottom: 1px solid #6d4a3355; padding-bottom: 6px; white-space: nowrap; overflow: hidden;
+}
+.cabeca::before, .cabeca::after { content: "✦"; color: var(--rubrica); font-size: .9em; letter-spacing: 0; }
+.texto { flex: 1; min-height: 0; overflow: hidden; line-height: 1.52; hyphens: manual; text-align: justify; font-kerning: none; font-variant-ligatures: none; }
+.texto p { margin: 0; text-indent: 1.4em; }
+.texto p.cont { text-indent: 0; }
+.texto p.fala { text-indent: 1.4em; }
+.texto p + p { margin-top: .32em; }
+.vers { font: 500 .6em "EB Garamond", serif; color: var(--rubrica); vertical-align: .55em; margin-right: .22em; text-indent: 0; letter-spacing: 0; }
+.rodape {
+  margin-top: calc(var(--ph) * .02); text-align: center; color: #6d4a33;
+  font: calc(var(--fs) * .8) "EB Garamond", serif; letter-spacing: .1em;
+}
+.rodape::before, .rodape::after { content: "—"; margin: 0 .6em; color: #6d4a3399; }
+
+.abertura { text-align: center; margin: calc(var(--ph) * .03) 0 calc(var(--ph) * .035); }
+.abertura .num { font: 600 calc(var(--fs) * .78) "Cinzel", serif; letter-spacing: .38em; color: var(--rubrica); text-transform: uppercase; }
+.abertura h2 { margin: .25em 0 .2em; font: 400 calc(var(--fs) * 2.15)/1.05 "UnifrakturMaguntia", serif; color: var(--tinta); }
+.ornamento { display: block; margin: 0 auto; width: 58%; height: 18px; color: var(--rubrica); }
+.capitular {
+  float: left; font: calc(var(--fs) * 4.3)/.82 "UnifrakturMaguntia", serif; color: var(--rubrica);
+  padding: .08em .1em .02em .06em; margin: .04em .12em 0 0;
+  background: linear-gradient(135deg, #f3e2a5, #c9a14f 45%, #f6e7b0 60%, #a8803a); -webkit-background-clip: padding-box;
+  border: 2px solid #7a5a22; box-shadow: inset 0 0 0 2px #f3e2a5, inset 0 0 0 3px #7a5a22;
+  text-shadow: 1px 1px 0 #f9edc9; text-indent: 0;
+}
+.texto p.inicio { text-indent: 0; }
+.texto p.inicio::first-line { font-variant: small-caps; letter-spacing: .04em; }
+
+.kw { color: #7a1b14; background: linear-gradient(transparent 62%, #b8873a2e 62%); cursor: pointer; border-radius: 1px; transition: background .2s; }
+.kw:hover, .kw:focus-visible { background: linear-gradient(transparent 0, #b8873a40 0); outline: none; }
+.kw.lida { color: #5a2a14; }
+.kw::after { content: "✠"; font-size: .55em; vertical-align: .7em; margin-left: .1em; color: #a3201b; }
+.kw.lida::after { color: #9c8a6a; }
+
+/* páginas especiais */
+.centro { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.rosto .sobre { font: 600 calc(var(--fs) * .72) "Cinzel", serif; letter-spacing: .36em; color: #6d4a33; text-transform: uppercase; }
+.rosto h2 { margin: .4em 0 .25em; font: 400 calc(var(--fs) * 2.65)/1.02 "UnifrakturMaguntia", serif; color: var(--tinta); }
+.rosto h2 .rubro { color: var(--rubrica); }
+.rosto .sub { font: italic calc(var(--fs) * 1.1) "IM Fell English", serif; color: #4b3021; margin: .6em 0 1.4em; }
+.rosto svg.emblema { width: 26%; color: var(--rubrica); }
+.rosto .pe { margin-top: 2.2em; font: 600 calc(var(--fs) * .62) "Cinzel", serif; letter-spacing: .3em; color: #6d4a33; text-transform: uppercase; }
+.epigrafe blockquote { margin: 0 8%; font: italic calc(var(--fs) * 1.28)/1.5 "IM Fell English", serif; color: #3a2418; }
+.epigrafe blockquote::before { content: "“"; display: block; font: calc(var(--fs) * 3.4)/.6 "UnifrakturMaguntia", serif; color: var(--rubrica); margin-bottom: .2em; }
+.epigrafe cite { display: block; margin-top: 1.3em; font: 600 calc(var(--fs) * .62) "Cinzel", serif; letter-spacing: .26em; color: #6d4a33; font-style: normal; text-transform: uppercase; }
+.sumario h2, .notas-pag h2 { text-align: center; margin: .1em 0 .2em; font: 400 calc(var(--fs) * 2)/1.1 "UnifrakturMaguntia", serif; color: var(--tinta); }
+.sumario ol { list-style: none; margin: 1.6em 0 0; padding: 0; display: grid; gap: .9em; }
+.sumario li button, .sumario li a {
+  width: 100%; display: flex; align-items: baseline; gap: .5em; background: none; border: 0; padding: 2px 0; text-align: left;
+  font: calc(var(--fs) * 1.05) "EB Garamond", serif; color: var(--tinta); text-decoration: none;
+}
+.sumario li .rom { font: 600 calc(var(--fs) * .78) "Cinzel", serif; color: var(--rubrica); min-width: 2.4em; letter-spacing: .08em; }
+.sumario li .pont { flex: 1; border-bottom: 1px dotted #6d4a3399; transform: translateY(-.3em); }
+.sumario li button:hover, .sumario li a:hover { color: var(--rubrica); }
+.sumario .jogo-item { margin-top: .6em; padding-top: .9em; border-top: 1px solid #6d4a3344; }
+.sumario .jogo-item a span:first-of-type { font-style: italic; }
+.branca .centro svg { width: 20%; color: #6d4a3366; }
+.notas-pag ul { list-style: none; padding: 0; margin: 1em 0 0; display: grid; gap: .75em; font-size: calc(var(--fs) * .9); line-height: 1.38; }
+.notas-pag li b { display: block; font: 600 calc(var(--fs) * .66) "Cinzel", serif; letter-spacing: .16em; color: var(--rubrica); text-transform: uppercase; }
+.notas-pag li.oculta { color: #6d4a3366; font-style: italic; }
+.notas-pag li.oculta b { color: #6d4a3366; }
+.notas-pag .dica-notas { text-align: center; font: italic calc(var(--fs) * .85) "IM Fell English", serif; color: #6d4a33; margin: .2em 0 0; }
+.fim .continua { font: italic calc(var(--fs) * 1.5) "IM Fell English", serif; color: var(--tinta); margin: .2em 0 1em; }
+.fim p.conv { font-size: calc(var(--fs) * .98); line-height: 1.5; max-width: 30ch; color: #3a2418; }
+.fim .botoes { display: grid; gap: .7em; margin-top: 1.4em; justify-items: center; }
+.botao-livro {
+  display: inline-block; text-decoration: none; padding: .55em 1.2em; border: 1px solid #7a1b14; color: #f6e7c4;
+  background: linear-gradient(#9b241c, #6e1510); font: 600 calc(var(--fs) * .7) "Cinzel", serif; letter-spacing: .2em; text-transform: uppercase;
+  box-shadow: inset 0 0 0 2px #c9a14f55, 0 2px 4px #0005;
+}
+.botao-livro.sec { background: none; color: #7a1b14; box-shadow: none; }
+.erro-cap { color: var(--rubrica); font-style: italic; text-align: center; }
+
+/* ---------- Tinta aparecendo ---------- */
+.revelando .c { opacity: 0; animation: tinta .55s ease-out forwards; animation-delay: calc(var(--i) * var(--vel)); }
+.revelando .capitular { opacity: 0; animation: capitular 1s ease-out forwards; }
+@keyframes tinta {
+  0% { opacity: 0; color: #9c2a1c; text-shadow: 0 0 6px #9c2a1c88; }
+  45% { opacity: 1; color: #5a1d12; text-shadow: 0 0 2px #5a1d1255; }
+  100% { opacity: 1; }
+}
+@keyframes capitular { from { opacity: 0; transform: scale(1.25) rotate(-4deg); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.w { white-space: nowrap; }
+
+/* ---------- Setas ---------- */
+.seta {
+  position: fixed; z-index: 25; top: 50%; transform: translateY(-50%); width: 46px; height: 86px;
+  background: #1a0f0b99; border: 1px solid #6b4a2b; color: #e8d3a8; font: 40px/1 "EB Garamond", serif; border-radius: 3px;
+}
+.seta:hover { border-color: #d6ad62; color: #fff; }
+.seta:disabled { opacity: .25; cursor: default; }
+.seta.ant { left: 12px; }
+.seta.prox { right: 12px; }
+.dica-leitura {
+  position: fixed; bottom: 12px; left: 0; right: 0; margin: 0; text-align: center; pointer-events: none;
+  font: italic 14px "IM Fell English", serif; color: #cdb48a99;
+}
+
+/* ---------- Nota ---------- */
+.nota {
+  position: fixed; z-index: 40; width: min(320px, calc(100vw - 24px)); padding: 16px 18px 14px;
+  background: url("pergaminho.jpg") 30% 40% / 600px, #efe2c3; color: #2b1a12;
+  border: 1px solid #8a6a3a; box-shadow: 0 14px 34px #000000b3, inset 0 0 26px #6d4a2240;
+  transform: rotate(-1deg); animation: nota .28s ease-out;
+  clip-path: polygon(0 2%, 4% 0, 30% 1%, 55% 0, 80% 1.5%, 100% 0, 99% 30%, 100% 62%, 99% 100%, 70% 98.5%, 40% 100%, 12% 98.6%, 0 100%, 1% 60%);
+}
+@keyframes nota { from { opacity: 0; transform: rotate(-4deg) translateY(8px) scale(.96); } }
+.nota-tag { margin: 0; font: 600 10px "Cinzel", serif; letter-spacing: .24em; color: #8e1f17; text-transform: uppercase; }
+.nota h2 { margin: 4px 0 6px; font: 400 26px/1.05 "UnifrakturMaguntia", serif; }
+.nota p:last-child { margin: 0; font: italic 17px/1.42 "IM Fell English", serif; }
+.nota-x { position: absolute; top: 4px; right: 8px; background: none; border: 0; font-size: 24px; color: #6d4a33; padding: 2px 6px; }
+
+.medidor { position: absolute; left: -9999px; top: 0; visibility: hidden; }
+.medidor .pagina { position: relative; left: 0; }
+.sem-js { position: fixed; inset: 0; display: grid; place-items: center; font-size: 20px; }
+
+@media (max-width: 760px) {
+  .seta { width: 34px; height: 64px; font-size: 30px; top: auto; bottom: 14px; transform: none; }
+  .barra { top: 6px; gap: 4px; }
+  .barra button, .barra a { font-size: 9px; padding: 6px 7px; letter-spacing: .08em; }
+  .dica-leitura { bottom: 30px; font-size: 12px; padding: 0 56px; }
+  .capa-dica { bottom: -38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .luz, .fita, .capa-dica { animation: none; }
+  :root { --virar: 1ms; }
+}
+
+.nota-img { display: block; width: calc(100% + 36px); margin: -16px -18px 10px; height: 170px; object-fit: cover; object-position: 50% 18%; background: #1b1411; border-bottom: 1px solid #8a6a3a; }
+.credito { position: fixed; right: 12px; bottom: 8px; margin: 0; font: italic 12px "EB Garamond", serif; color: #8d775f; }
+@media (max-width: 760px) { .credito { display: none; } }
